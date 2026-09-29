@@ -90,6 +90,9 @@
 - [Cost Control For Side Projects](07-Cost-Control)
 - [Local To Cloud Walkthrough](07-Local-To-Cloud-Walkthrough)
 - [Deployment Exercises](07-Deployment-Exercises)
+- [Deploy For Free](07-Deploy-For-Free)
+- [Accept Payments In Kenya](07-Accept-Payments-In-Kenya)
+- [Local Models When Code Cannot Leave](07-Local-Models-When-Code-Cannot-Leave)
 
 **[8. MCP](08-MCP)**
 - [What Is MCP?](08-What-Is-MCP)
@@ -120,6 +123,7 @@
 - [Definition Of Done](10-Definition-Of-Done)
 - [Debugging Discipline](10-Debugging-Discipline)
 - [Quality Exercises](10-Quality-Exercises)
+- [Regression Testing Your Agent Harness](10-Regression-Testing-Your-Agent-Harness)
 
 **[11. Documentation](11-Documentation)**
 - [Docs As Code](11-Docs-As-Code)
@@ -170,6 +174,7 @@
 - [Mermaid Cookbook](16-Mermaid-Cookbook)
 - [Templates](16-Templates)
 - [Link Index](16-Link-Index)
+- [The Zero Dollar Stack](16-Zero-Dollar-Stack)
 
 ---
 **[Further learning](15-Further-Learning)** · **[Templates](16-Templates)** · **[Link index](16-Link-Index)**

@@ -30,6 +30,9 @@
 ### [Quality Exercises](10-Quality-Exercises)
 `intermediate` · ~25 min — Reading about verification does not build the reflex. These four exercises do. You write a suite small enough to finish in an hour, then deliberately break the code to prove the suite bites.
 
+### [Regression Testing Your Agent Harness](10-Regression-Testing-Your-Agent-Harness)
+`advanced` · ~20 min — Prompts, rules files, skills and tool schemas change weekly with no tests — a golden set captured from real traces catches the regression before your users do.
+
 ---
 
 ← [9. Safety & Security](09-Safety-And-Security) · [Home](Home) · [Sidebar](_Sidebar) · [11. Documentation](11-Documentation) →

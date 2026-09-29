@@ -10,6 +10,22 @@ A test harness is what makes refactoring safe. Green before, green after, behavi
 
 Run the suite *before* you touch anything, and record the result. "All green" is the baseline. If it is already failing, you have no way to attribute the next failure, so fix or quarantine the red tests first.
 
+The whole loop, end to end. The order is what makes a refactor reviewable:
+
+```mermaid
+flowchart TD
+    A["Baseline: run the suite, record the result"] --> B{"Green?"}
+    B -- "no" --> C["Fix the red tests first: a red baseline cannot prove no behaviour change"]
+    B -- "yes" --> D["Write a characterisation test for today's behaviour, edge case included"]
+    D --> E["Commit the test on its own"]
+    E --> F["Mechanical refactor: rename, move, extract"]
+    F --> G{"Suite green and the diff only moves code?"}
+    G -- "no" --> H["Revert to the last green commit and split the change"]
+    H --> F
+    G -- "yes" --> I["Commit the refactor"]
+    I --> J["Then the behaviour change, its own commit, its own test"]
+```
+
 ## Characterisation tests before legacy code
 
 Legacy code is code you do not understand and are afraid to change. The tool for it is the **characterisation test**: a test that pins down what the code *currently* does, including behaviour you suspect is wrong.

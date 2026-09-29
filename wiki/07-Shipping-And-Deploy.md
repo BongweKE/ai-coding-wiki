@@ -39,6 +39,15 @@
 ### [Deployment Exercises](07-Deployment-Exercises)
 `intermediate` · ~25 min — You can read about rollback for an hour and still freeze the first time production breaks. The knowledge that helps under pressure is the kind you have already used with your hands.
 
+### [Deploy For Free](07-Deploy-For-Free)
+`beginner` · ~20 min — Free tiers have failure modes — sleeping instances, quota cliffs, expiring storage — so pick the layer that hurts least and cap the spend before you ship.
+
+### [Accept Payments In Kenya](07-Accept-Payments-In-Kenya)
+`intermediate` · ~25 min — Stripe is not directly available in Kenya, so the work goes through Paystack, Flutterwave, Pesapal or Daraja — the same webhook-shaped problem every time.
+
+### [Local Models When Code Cannot Leave](07-Local-Models-When-Code-Cannot-Leave)
+`intermediate` · ~18 min — When the code cannot leave the machine, a local model behind an OpenAI-compatible endpoint on localhost gives you a working agent and no per-token bill.
+
 ---
 
 ← [6. System Design](06-System-Design) · [Home](Home) · [Sidebar](_Sidebar) · [8. MCP](08-MCP) →

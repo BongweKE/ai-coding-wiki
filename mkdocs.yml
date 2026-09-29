@@ -16,7 +16,10 @@ site_description: >-
   A free, technical, bite-sized wiki for people who are new to software
   engineering but want to build real things with AI coding agents —
   and not get burned doing it.
-site_url: https://bongweke.github.io/ai-coding-wiki/
+# The canonical URL. The site is also published to GitHub Pages as a mirror
+# (bongweke.github.io/ai-coding-wiki/), but absolute URLs — canonical links,
+# the sitemap, link previews and the 404 page — point at the domain.
+site_url: https://vibe.bongwe.space/
 repo_url: https://github.com/BongweKE/ai-coding-wiki
 repo_name: BongweKE/ai-coding-wiki
 edit_uri: edit/main/wiki/
@@ -57,6 +60,9 @@ validation:
 
 theme:
   name: material
+  # overrides/ adds the link-preview tags (main.html) and an absolute-link
+  # 404 page that works on both the domain and the github.io mirror.
+  custom_dir: overrides
   features:
     - navigation.top
     - navigation.tracking
@@ -95,6 +101,18 @@ markdown_extensions:
   - pymdownx.emoji
 
 # Generated from wiki/_Sidebar.md — the same order as the wiki navigation.
+# Site-level extras: the social preview image (overrides/main.html reads it),
+# the repo link in the footer, and the privacy-friendly analytics switch.
+extra:
+  social_image: https://vibe.bongwe.space/og-card.png
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/BongweKE/ai-coding-wiki
+  # GoatCounter: open source, cookieless, free for non-commercial use.
+  # Create an account, then put the site code here (e.g. "bongwe" for
+  # https://bongwe.goatcounter.com) and scripts/site_hook.py injects the
+  # script tag on every page. Empty = no analytics, no third-party requests.
+  analytics_code: ""
 nav:
   - Home: index.md
   - '0. Start Here':
@@ -186,6 +204,9 @@ nav:
       - 'Cost Control For Side Projects': 07-Cost-Control.md
       - 'Local To Cloud Walkthrough': 07-Local-To-Cloud-Walkthrough.md
       - 'Deployment Exercises': 07-Deployment-Exercises.md
+      - 'Deploy For Free': 07-Deploy-For-Free.md
+      - 'Accept Payments In Kenya': 07-Accept-Payments-In-Kenya.md
+      - 'Local Models When Code Cannot Leave': 07-Local-Models-When-Code-Cannot-Leave.md
   - '8. MCP':
       - Overview: 08-MCP.md
       - 'What Is MCP?': 08-What-Is-MCP.md
@@ -216,6 +237,7 @@ nav:
       - 'Definition Of Done': 10-Definition-Of-Done.md
       - 'Debugging Discipline': 10-Debugging-Discipline.md
       - 'Quality Exercises': 10-Quality-Exercises.md
+      - 'Regression Testing Your Agent Harness': 10-Regression-Testing-Your-Agent-Harness.md
   - '11. Documentation':
       - Overview: 11-Documentation.md
       - 'Docs As Code': 11-Docs-As-Code.md
@@ -266,3 +288,4 @@ nav:
       - 'Mermaid Cookbook': 16-Mermaid-Cookbook.md
       - 'Templates': 16-Templates.md
       - 'Link Index': 16-Link-Index.md
+      - 'The Zero Dollar Stack': 16-Zero-Dollar-Stack.md
