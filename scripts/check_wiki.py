@@ -73,6 +73,42 @@ def index_pages():
     return exempt
 
 
+def section_indexes(pages):
+    """Pages that open with a section overview blockquote rather than a lesson one."""
+    out = []
+    pattern = re.compile(r"^> \*\*Section \d+ · (?![^ ]*Lesson)[^*]*\*\* —")
+    for f in pages:
+        if pattern.match(open(os.path.join(WIKI, f), encoding="utf-8").readline()):
+            out.append(f)
+    return out
+
+
+def check_manifest_counts(mp, pages):
+    """The manifest's own numbering line must match the tree (it drifted once:
+    it claimed 20 section indexes when the tree had 17)."""
+    line = None
+    for l in open(MANIFEST, encoding="utf-8"):
+        if l.startswith("Total pages:"):
+            line = l.strip()
+            break
+    if line is None:
+        err("WIKI-MANIFEST.md", "no 'Total pages:' line")
+        return
+    m = re.match(r"Total pages:\s*(\d+)\s+lessons\s*\+\s*(\d+)\s+section indexes", line)
+    if not m:
+        err("WIKI-MANIFEST.md", f"unrecognised page count line: {line!r}")
+        return
+    want_lessons, want_indexes = int(m.group(1)), int(m.group(2))
+    have_lessons = len(mp)
+    have_indexes = len(section_indexes(pages))
+    if want_lessons != have_lessons:
+        err("WIKI-MANIFEST.md", f"says {want_lessons} lessons, the manifest tables list {have_lessons}")
+    if want_indexes != have_indexes:
+        err("WIKI-MANIFEST.md", f"says {want_indexes} section indexes, the tree has {have_indexes}")
+    if "Home" not in line:
+        warn("WIKI-MANIFEST.md", f"page count line does not mention Home: {line!r}")
+
+
 def prose_words(text):
     stripped = re.sub(r"```.*?```", "", text, flags=re.S)
     stripped = re.sub(r"^\s*\|.*$", "", stripped, flags=re.M)   # tables are not prose
@@ -176,6 +212,7 @@ def main():
             errors.append(f"{orphan} is not in WIKI-MANIFEST.md (orphan page)")
         else:
             warnings.append(f"{orphan} is not in WIKI-MANIFEST.md")
+    check_manifest_counts(mp, pages)
 
     print(f"checked {len(pages)} pages · {len(mp)} in manifest · {len(errors)} errors · {len(warnings)} warnings")
     for e in errors:

@@ -19,5 +19,13 @@ mkdir -p site-src
 cp wiki/*.md site-src/
 cp wiki/00-Home.md site-src/index.md
 
-mkdocs build
+# --strict: an unresolved link or missing anchor fails the build rather than
+# printing an INFO line nobody reads (the levels are set in mkdocs.yml).
+mkdocs build --strict
+
+# Then check the output: MkDocs validates source links, this validates that
+# every link it actually wrote resolves. It is the gate that would have caught
+# scripts/site_hook.py leaving all 828 internal links unrewritten.
+python3 scripts/check_site.py site
+
 echo "site built -> site/index.html"
