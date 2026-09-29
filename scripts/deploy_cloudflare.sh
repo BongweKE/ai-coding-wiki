@@ -14,6 +14,13 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+if ! command -v mkdocs >/dev/null 2>&1; then
+  echo "mkdocs is not on PATH. Install it first:" >&2
+  echo "  pip install 'mkdocs-material>=9.5,<10'" >&2
+  echo "or activate the virtualenv that has it (CI uses actions/setup-python)." >&2
+  exit 1
+fi
+
 bash scripts/build_site.sh
 
 # Prefer the installed binary; fall back to a pinned npx copy so the script
