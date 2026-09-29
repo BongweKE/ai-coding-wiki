@@ -51,8 +51,9 @@ read_token() {
   say "Create an API token (30 seconds)"
   cat <<'INSTRUCTIONS'
 Cloudflare dashboard -> My Profile -> API Tokens -> Create Token
-  Permissions:       Account / Workers Scripts / Edit
-                     Account / Workers Routes  / Edit
+  Permissions:       Account / Workers Scripts / Edit     (upload the Worker)
+                     Account / Workers Routes  / Edit     (own the hostname)
+                     Zone    / Zone            / Read     (safety margin)
   Account resources: include your account
 Copy the token, then paste it below. Input is hidden while you type.
 INSTRUCTIONS

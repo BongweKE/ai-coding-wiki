@@ -114,4 +114,9 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Pin wrangler 4: the action otherwise installs 3.x, which does not
+          # read wrangler.jsonc at all. The failure is "Missing entry-point",
+          # because no main and no assets were ever loaded — it looks like a
+          # bad config, not a version mismatch.
+          wranglerVersion: "4"
           command: deploy

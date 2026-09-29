@@ -25,6 +25,8 @@
   },
   "routes": [
     { "pattern": "vibe.bongwe.space", "custom_domain": true },
-    { "pattern": "vibe.bongwe.space/*", "zone_name": "bongwe.space" }
+    // zone_id rather than zone_name: naming the zone makes wrangler look it
+    // up, which needs Zone:Read on the token. The id is already known.
+    { "pattern": "vibe.bongwe.space/*", "zone_id": "9db4d31df1e00dc9ddb9ac3f56bbacaa" }
   ]
 }
