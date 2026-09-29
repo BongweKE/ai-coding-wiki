@@ -1,27 +1,33 @@
-> **Section 1 · Foundations: How AI Coding Works** — Give a beginner a correct mental model of LLMs and agents before they touch a workflow.
+> **Section 1 · Foundations** — A correct mental model: models, tokens, context, the agent loop, and where agents are weak.
 
-A correct mental model: models, tokens, context, the agent loop, and where agents are weak.
+*6 lessons.*
 
-*6 lessons in this section.*
+## By the end of this section you can
+
+- Describe what a model actually does when it answers, and why it can be confidently wrong.
+- Explain the agent loop, and why verification must be a tool result rather than an opinion.
+- Judge whether a task suits an agent — and when to keep it yourself.
+- Name the five things competing for space in a context window, and the cheapest lever on each.
 
 ### [How LLMs Work For Coders](01-How-LLMs-Work-For-Coders)
-`beginner` · ~12 min — Next-token prediction in plain words; why output is probabilistic and why 'the same prompt twice' differs.
+`beginner` · ~12 min — When you ask an agent to add a feature, you are not talking to a mind that held a meeting about your codebase.
 
 ### [From Autocomplete To Agents](01-From-Autocomplete-To-Agents)
-`beginner` · ~10 min — the model asks to run something, the harness runs it, the result goes back into context.
+`beginner` · ~10 min — Autocomplete finishes your line. An agent finishes your task.
 
 ### [The Agent Loop](01-The-Agent-Loop)
-`beginner` · ~12 min — gather context -> plan -> act with a tool -> verify with evidence -> repeat or stop.
+`beginner` · ~12 min — An agent that finishes in one shot is the exception.
 
 ### [What Agents Are Good And Bad At](01-What-Agents-Are-Good-And-Bad-At)
-`beginner` · ~12 min — boilerplate, tests, refactors with a test harness, reading an unfamiliar codebase, migrations of repetitive call sites, docs.
+`beginner` · ~12 min — Delegating the wrong task wastes more time than doing it yourself.
 
 ### [A Taxonomy Of Context](01-Taxonomy-Of-Context)
-`intermediate` · ~12 min — your instructions (rules files), the conversation, repository files it reads, tool results, and retrieved external docs.
+`intermediate` · ~12 min — Two agents on the same model, given the same task, can produce a working change and an unusable mess. The difference is almost never the model. It is what was in the window when they started.
 
 ### [Choosing A Model](01-Choosing-Models)
-`beginner` · ~10 min — reasoning quality, tool-use reliability, latency, price, context size.
+`beginner` · ~10 min — Model names change every few months, so memorising the current best one is wasted effort.
 
 ---
 
-Section 1 of 16 · [Home](Home) · [Sidebar index](_Sidebar)
+← [0. Start Here](00-Start-Here) · [Home](Home) · [Sidebar](_Sidebar) · [2. Prompting & Context](02-Prompting-And-Context) →
+

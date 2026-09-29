@@ -2,7 +2,7 @@
 
 ## Why this matters
 
-The README is the only document every visitor reads, human or agent, before deciding whether your project is worth their time. A reader who cannot answer "what is this, and can I run it" within two minutes leaves. A cheap README is also the highest-leverage file in the repository: an agent that reads it starts with correct commands instead of guessing your test runner.
+The README is the only document every visitor reads, human or agent, before deciding whether your project is worth their time. A reader who cannot answer "what is this, and can I run it" within two minutes leaves. A cheap README is also the highest-value file in the repository: an agent that reads it starts with correct commands instead of guessing your test runner.
 
 ## The first screen
 

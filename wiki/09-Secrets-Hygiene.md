@@ -7,22 +7,20 @@ A leaked key is not a code bug you fix on Friday. It is a stranger holding your 
 There are exactly two acceptable homes for a secret.
 
 - **On the machine that needs it**: an environment variable, loaded from a file that is never committed, or from your OS keychain.
-- **In the platform that runs the code**: a secret store on your host or CI provider, injected into the process at runtime.
+- **In the platform that runs the code**: a secret store on your host or CI provider, injected at runtime.
 
-Everywhere else is wrong: never in source, never in a config file committed to git, never in a Docker image layer, never in a chat message or an issue, never in a prompt. "It is a private repo" is not protection — history is forever, collaborators change, and a fork or a mis-scoped token exposes it.
+Everywhere else is wrong: not in source, not in config committed to git, not in an image layer, not in a chat message or an issue, not in a prompt. "It is a private repo" is not protection — history is forever, and a fork or a mis-scoped token exposes it.
 
 ## The `.env` pattern
 Gitignore the real file, commit a template, and load at runtime.
 
-```bash
-# .gitignore
+```gitignore
 .env
 .env.*
 !.env.example
 ```
 
-```bash
-# .env.example - committed, contains no real values
+```ini
 DATABASE_URL=postgres://user:password@localhost:5432/app
 SERVICE_API_KEY=sk-...REDACTED
 ```
@@ -36,27 +34,29 @@ api_key = os.environ["SERVICE_API_KEY"]  # fails loudly if unset
 Keep one file per environment, and never reuse a value across them. `.env.local`, `.env.staging` and the production values in the platform's secret store should be different credentials, so a mistake in development cannot spend production money. Giving each environment its own key is what makes rotation cheap later.
 
 ## Scanning, and what to do when a key leaks
-A secret scanner catches the mistake before a human reviewer does. Pattern scanners look for known credential shapes in a diff; commit-history scanners look at everything already pushed. Add one as a required check on every pull request, and turn on your host's push protection so a known credential shape is rejected at push time. The tooling changes often — pick one, read its current docs, and make the scan a gate rather than a warning.
+A secret scanner catches the mistake before a human reviewer does. Pattern scanners look for known credential shapes in a diff; history scanners look at everything already pushed. Add one as a required check on every pull request, and turn on your host's push protection so a known credential shape is rejected at push time. Tooling changes often — pick one, read its current docs, and make the scan a gate rather than a warning.
 
 When a key leaks, the order matters:
 
-1. **Rotate first.** Issue a new credential and revoke the old one. Assume it is compromised the moment it is visible. Do not start with cleanup.
-2. **Then purge.** Removing the value from git history is worthwhile, but it is cleanup, not containment. Rotating already made the leaked value useless.
+1. **Rotate first.** Issue a new credential and revoke the old one, and assume it is compromised from the moment it is visible.
+2. **Then purge.** Removing the value from git history is cleanup, not containment; rotating already made the leaked value useless.
 3. **Then scan.** Search the whole history, the CI logs and any build caches for the same value or a variant of it.
 4. **Then add a gate.** A scanner on pull requests plus push protection stops the repeat.
 
-Notice what is not on that list: waiting to see whether anyone uses the key. Assume they will.
+Do not wait to see whether anyone uses the key. Assume they will.
 
 ## Why the platform's variables beat a file
 A deployed service should be configured by the environment it runs in, not by a file your laptop carries. Platform variables are encrypted at rest, are injected only into the running process, are visible to the people who run the deploy, and can be scoped to an environment that requires approval to use. A `.env` file on your laptop is none of those things, and it is the copy most likely to end up in a backup, an editor sync folder or a screenshot. If your laptop does not hold the production key, your laptop cannot leak it.
 
+![Where credentials live across a build and deploy chain](https://raw.githubusercontent.com/BongweKE/ai-coding-wiki/main/assets/09-supply-chain.png)
+
 ## Rotation, scope and separation
 Three habits keep the blast radius small.
 
-- **Rotate on a schedule and on suspicion.** Pick a cadence you will actually keep — say annually for stable keys, sooner for anything exposed to a third party — and rotate immediately after any team change or suspected exposure. Write the procedure down as a runbook: generate, update staging, test end to end, update production, watch for failures.
-- **Scope every token.** Grant the narrowest permissions that do the job: read-only where reading is all it does, one resource rather than the whole account, one environment rather than all of them.
-- **Separate credentials per environment and per purpose.** One key for deploys, one for the API client, one for backups. A shared key means one leak is every leak.
-- **Audit yearly.** Delete variables nobody can explain. Old sandbox credentials left set in production are a common finding, and they are free attack surface.
+- **Rotate on a schedule and on suspicion.** Pick a cadence you will keep — annually for stable keys, sooner for anything exposed to a third party — and rotate immediately after a team change or suspected exposure. Write it down as a runbook: generate, update staging, test end to end, update production, watch for failures.
+- **Scope every token.** Grant the narrowest permissions that do the job: read-only where reading is all it does, one resource not the whole account, one environment not all of them.
+- **Separate credentials per environment and purpose.** One key for deploys, one for the API client, one for backups. A shared key means one leak is every leak.
+- **Audit yearly.** Delete variables nobody can explain; stale sandbox credentials left set in production are free attack surface.
 
 ```mermaid
 flowchart TD
@@ -87,10 +87,10 @@ flowchart TD
 
 ## Common mistakes
 - **Cleaning history before rotating.** Rewriting the past does not un-leak a key. Rotate, then tidy.
-- **Committing `.env.example` with real values.** It is the file people copy most, and it is the one most often accidentally filled in.
-- **One key for every environment.** Then you cannot test rotation, cannot tell which environment caused an incident, and cannot revoke one without breaking the others.
+- **Committing `.env.example` with real values.** It is the file people copy most, and the one most easily filled in by accident.
+- **One key for every environment.** Then you cannot test rotation, cannot tell which environment caused an incident, and cannot revoke one alone.
 - **Putting a secret in a URL query string.** URLs end up in access logs, browser history and error reports.
-- **Asking the agent to "just set it up" without saying where secrets live.** It will write the value into the first file that works. Say the rule in your [AGENTS.md](12-AGENTS-md-That-Works).
+- **Letting the agent "just set it up"** without saying where secrets live. It will write the value into the first file that works; put the rule in your [AGENTS.md](12-AGENTS-md-That-Works).
 
 ## Key takeaways
 - Two homes only: environment variables on the machine, or the platform's secret store. Never source, never config in git, never chat.

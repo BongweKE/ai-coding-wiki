@@ -1,39 +1,45 @@
-> **Section 7 · Shipping: Deploy & Operate** — Get code off your laptop and keep it running — deploys, databases, environments, rollback, cost.
+> **Section 7 · Shipping & Deploy** — Railway, Neon, edge workers, environments, promotion, rollback and cost control.
 
-Railway, Neon, edge workers, environments, promotion, rollback and cost control.
+*10 lessons.*
 
-*10 lessons in this section.*
+## By the end of this section you can
+
+- Deploy an API and a database to the internet and keep them running.
+- Use environments properly: staging automatic, production deliberate, migrations before code.
+- Write a rollback plan before you need it, and run an incident without thrashing.
+- Know where the money goes, and set limits before you scale.
 
 ### [Deployment Concepts](07-Deployment-Concepts)
-`beginner` · ~15 min — turning source into an immutable artefact, then starting it with configuration.
+`beginner` · ~15 min — Your laptop has your files, your .env, your Python version and your half-installed packages on it. A server has none of that.
 
 ### [Deploy On Railway](07-Deploy-On-Railway)
-`beginner` · ~20 min — Project/service/environment model, and linking a local folder to a service.
+`beginner` · ~20 min — Railway is the shortest path from a folder on your laptop to a URL someone else can open. It builds your code, runs it, injects your variables and gives you logs.
 
 ### [Postgres On Neon](07-Postgres-On-Neon)
-`intermediate` · ~20 min — compute and storage separated, scale-to-zero, cold-start behaviour.
+`intermediate` · ~20 min — A database that runs on your laptop and one that runs for users are different problems.
 
 ### [Edge With Cloudflare Workers](07-Edge-With-Cloudflare-Workers)
-`intermediate` · ~15 min — static assets, redirects, headers, light API glue, per-request auth checks.
+`intermediate` · ~15 min — Some requests should be answered before they reach your server: a redirect, a cache miss, a security header, a check that the caller is allowed to see this at all.
 
 ### [Object Storage And Artifacts](07-Object-Storage-And-Artifacts)
-`intermediate` · ~12 min — what object storage is for (files, models, backups, build artefacts, downloads).
+`intermediate` · ~12 min — Two things do not belong in git and do not belong on a container's disk: large files your users download, and build outputs your pipeline produces.
 
 ### [Environments And Promotion](07-Environments-And-Promotion)
-`advanced` · ~20 min — main auto-deploys to staging; production only through an explicit, approved workflow.
+`advanced` · ~20 min — main is not production. If merging a pull request ships straight to real users, the only review that matters happens after the damage.
 
 ### [Rollbacks And Incidents](07-Rollbacks-And-Incidents)
-`intermediate` · ~18 min — immutable artefacts, backward-compatible migrations, feature flags.
+`intermediate` · ~18 min — Every deploy bets that the new version is better than the one running. Sometimes the bet loses, and the only question left is how long users stay affected.
 
 ### [Cost Control For Side Projects](07-Cost-Control)
-`intermediate` · ~15 min — Know your free tiers and the exact moment you leave them; set spend limits and alerts before you need them.
+`intermediate` · ~15 min — Small projects do not die from a bill they saw coming.
 
 ### [Local To Cloud Walkthrough](07-Local-To-Cloud-Walkthrough)
-`beginner` · ~25 min — a tiny API + a Postgres database + a static frontend, from an empty folder to a live URL.
+`beginner` · ~25 min — You have read about builds, variables, migrations, staging and gates.
 
 ### [Deployment Exercises](07-Deployment-Exercises)
-`intermediate` · ~25 min — Deploy a toy app; break it deliberately (bad env var, missing migration, wrong port) and fix each from logs alone.
+`intermediate` · ~25 min — You can read about rollback for an hour and still freeze the first time production breaks. The knowledge that helps under pressure is the kind you have already used with your hands.
 
 ---
 
-Section 7 of 16 · [Home](Home) · [Sidebar index](_Sidebar)
+← [6. System Design](06-System-Design) · [Home](Home) · [Sidebar](_Sidebar) · [8. MCP](08-MCP) →
+

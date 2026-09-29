@@ -34,22 +34,22 @@ Eight files cover the questions that come up most days. A real map from a shippe
 
 Duplication is the defect to design out. If your endpoint list lives in the README, the API doc, and a saved HTTP-client collection, two of those are already wrong and a reader cannot tell which. Give every fact one home and link to it from everywhere else. Where a fact genuinely must repeat — a table of environments, the list of gates — decide which copy is authoritative and have the others say so out loud with a link.
 
-When a section confuses you, do not append a clarification under the stale text. Delete the stale text and write what is true now. A page carrying three generations of contradiction is worse than an empty page, because a confident reader acts on the oldest paragraph.
+When a section confuses you, do not append a clarification under the stale text. Delete and rewrite. A page carrying three generations of contradiction is worse than an empty page, because a reader acts on the oldest paragraph.
 
 ## Docs are agent context
 
-An agent's output quality is bounded by the context it can find. A docs tree that states "the wire format between the API and its clients is camelCase; never return raw database rows" improves every future session, and costs nothing to follow because it is read before the first line gets written. The cheapest way to raise the floor on agent work is a good docs folder plus a short rules file that points into it ([AGENTS.md that actually works](12-AGENTS-md-That-Works)). Keep the rules file thin — it is paid for on every task, including the ones that never touch architecture.
+An agent's output quality is bounded by the context it can find. A docs tree that states "the wire format between the API and its clients is camelCase; never return raw database rows" improves every future session. The cheapest way to raise the floor on agent work is a good docs folder plus a short rules file that points into it ([AGENTS.md that actually works](12-AGENTS-md-That-Works)) — kept thin, because it is paid for on every task.
 
 ## Tooling discipline
 
-Three habits keep the tree honest. Markdown only: plain-text diffs, renders on the repository host, greppable by you and by an agent. Diagrams as code: a mermaid block in the doc changes in the same PR as the design it describes. Link checking in CI: a workflow that fails on a broken relative path or a dead URL is about ten lines ([GitHub Actions documentation](https://docs.github.com/en/actions)).
+Three habits keep the tree honest. Markdown only: plain-text diffs, greppable by you and by an agent. Diagrams as code: a mermaid block changes in the same PR as the design it describes. Link checking in CI: a workflow that fails on a dead relative path is about ten lines ([GitHub Actions documentation](https://docs.github.com/en/actions)).
 
 ## Try it
 
 1. Create `docs/` in a project you own and list every question a new contributor asks you in chat. Aim for eight.
 2. Write the map as a table: question, file, one clause of purpose. Create any file the table promises.
 3. Add the table to your rules file under a "where facts live" heading.
-4. Run a link check locally: `grep -rn '](\./' docs/ | head` and open a few targets by hand. Add the CI version when the tree is bigger than three files.
+4. Check links locally with `grep -rn '](\\./' docs/` and open a few targets by hand; add the CI version when the tree grows past three files.
 5. Commit docs and code together in one PR. From now on, no doc-only PRs where a code change was the reason.
 
 ## Common mistakes
@@ -57,7 +57,7 @@ Three habits keep the tree honest. Markdown only: plain-text diffs, renders on t
 - **A doc folder nobody reads** — `docs/` created during a burst of enthusiasm, never opened again. Fix: put the doc map in the README and the rules file, so both a human and an agent arrive through it.
 - **The same fact in three files** — environment URLs in the README, the runbook and a deployment script. Fix: one home, links elsewhere, and delete the copies rather than adding a fourth.
 - **Appending contradictions** — new text under old text instead of a rewrite. The page now disagrees with itself. Fix: delete and rewrite, or delete the section entirely.
-- **Docs that describe the plan, not the system** — a roadmap masquerading as architecture, so nobody can tell what is real. Fix: separate status ("shipped", "prototype", "planned") from description.
+- **Docs that describe the plan, not the system** — a roadmap masquerading as architecture. Fix: label status (shipped, prototype, planned) separately from description.
 
 ## Key takeaways
 

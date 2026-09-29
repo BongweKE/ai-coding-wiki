@@ -1,52 +1,58 @@
-> **Section 5 · Git & CI/CD with gh** — From a terminal to a green CI run on your first pull request.
+> **Section 5 · Git & CI/CD** — Git, the GitHub CLI, workflows, the checks that matter, hardening, releases and deploys.
 
-Git, the GitHub CLI, workflows, the checks that matter, hardening, releases and deploys.
+*13 lessons in two parts.* Part 1: 1: git, gh, and your first pipeline. Part 2: 2: gates, secrets, releases, troubleshooting.
 
-*13 lessons in this section.*
+## By the end of this section you can
+
+- Branch, commit, push and open a reviewed pull request with the GitHub CLI.
+- Write a workflow file that lints, tests and fails loudly on every pull request.
+- Choose the checks worth their CI minutes, and know what each one catches.
+- Protect the main branch, manage secrets, harden third-party actions, and release deliberately.
 
 ## Git & CI/CD with gh (Part 1: git, gh, and your first pipeline)
 
 ### [Git Essentials For The AI Era](05-Git-Essentials)
-`beginner` · ~20 min — it is the undo button, the review surface, and the audit trail.
+`beginner` · ~20 min — An AI coding agent can rewrite forty files in ninety seconds. That speed is only safe because of one boring tool: git.
 
 ### [GitHub CLI Quickstart](05-GitHub-CLI-Quickstart)
-`beginner` · ~15 min — gh auth login, gh auth status, the scopes you need.
+`beginner` · ~15 min — Every task that sends you to a browser tab breaks your flow. The GitHub CLI (gh) puts issues, pull requests, and CI runs in the same terminal where you already work.
 
 ### [Branching And Pull Requests](05-Branching-And-Pull-Requests)
-`beginner` · ~15 min — review, CI, rollback, history.
+`beginner` · ~15 min — A branch plus a pull request costs you two minutes and buys four things: a diff someone else can review, a place for CI to run before the code reaches main, a record you can point to when something breaks, and a clean way to abandon work that turned out wrong.
 
 ### [Writing GitHub Actions](05-Writing-GitHub-Actions)
-`beginner` · ~20 min — workflow (a YAML file in .github/workflows), event (on:), job (runner + steps), step (uses: or run:), action, runner, artefact.
+`beginner` · ~20 min — CI/CD means continuous integration and continuous delivery: a machine that runs your checks on every change so a broken commit never reaches main by accident.
 
 ### [Your First CI Pipeline](05-Your-First-CI-Pipeline)
-`beginner` · ~20 min — checkout, set up runtime with caching, install, lint, test.
+`beginner` · ~20 min — A pipeline that runs your checks but never fails is worse than no pipeline, because it teaches you to trust a green tick that means nothing.
 
 ### [Checks That Actually Matter](05-Checks-That-Actually-Matter)
-`intermediate` · ~20 min — format, lint, type check, unit tests, build, migration lint, dependency/secret scan, integration tests, coverage threshold, smoke test against a deplo
+`intermediate` · ~20 min — A pipeline can hold ten checks and still miss the bug that costs you a weekend.
 
 ### [Fast And Reliable Checks](05-Fast-And-Reliable-Checks)
-`intermediate` · ~18 min — caching, parallel jobs, matrix builds, path filters, fail-fast, cancel-in-progress.
+`intermediate` · ~18 min — A pipeline that takes twenty minutes will be bypassed. People stop waiting, merge on a hunch, and the checks become theatre. Speed is what keeps the gate in the loop.
 
 ## Git & CI/CD with gh (Part 2: gates, secrets, releases, troubleshooting)
 
 ### [Branch Protection And Required Checks](05-Branch-Protection-And-Required-Checks)
-`intermediate` · ~15 min — required status checks, review requirements, no force-push, linear history.
+`intermediate` · ~15 min — A workflow file that nothing enforces is a suggestion.
 
 ### [Secrets In CI](05-Secrets-In-CI)
-`intermediate` · ~15 min — repository secrets, environment secrets, organisation secrets, and short-lived OIDC tokens instead of long-lived keys.
+`intermediate` · ~15 min — Your pipeline needs credentials: a database URL to run migrations, a deploy token, an API key for an integration test.
 
 ### [Hardening GitHub Actions](05-Hardening-GitHub-Actions)
-`advanced` · ~20 min — Pin third-party actions to a full commit SHA; tags are mutable and a compromised dependency becomes your credential.
+`advanced` · ~20 min — A workflow file is code that runs with your repository's credentials, on a machine that can reach your secrets.
 
 ### [Releases, Tags And Versioning](05-Releases-Tags-And-Versioning)
-`intermediate` · ~15 min — Semantic versioning in one paragraph, and what counts as breaking for an API, a CLI, and a mobile app.
+`intermediate` · ~15 min — A commit hash is a perfect identifier and a terrible announcement. Nobody says "we shipped 4f9c2ab".
 
 ### [Deployment Pipelines](05-Deployment-Pipelines)
-`advanced` · ~20 min — Continuous delivery vs continuous deployment; why most teams want deploy-to-staging automatic and promotion-to-production manual.
+`advanced` · ~20 min — A release workflow that builds one artefact does not yet tell you how it reaches users.
 
 ### [CI Troubleshooting](05-CI-Troubleshooting)
-`beginner` · ~15 min — Read the failing step, not the whole log; the last error before exit is usually the cause.
+`beginner` · ~15 min — A red pipeline is not a wall, it is a message: something you cannot yet see would have broken for a user.
 
 ---
 
-Section 5 of 16 · [Home](Home) · [Sidebar index](_Sidebar)
+← [4. Agent Skills](04-Agent-Skills) · [Home](Home) · [Sidebar](_Sidebar) · [6. System Design](06-System-Design) →
+

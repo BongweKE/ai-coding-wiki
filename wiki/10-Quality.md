@@ -1,30 +1,36 @@
-> **Section 10 · Quality: Testing & Evals** — Build the verification machinery that makes fast AI-assisted work safe.
+> **Section 10 · Quality** — Tests, integration and smoke tests, evals for AI features, definition of done, debugging.
 
-Tests, integration and smoke tests, evals for AI features, definition of done, debugging.
+*7 lessons.*
 
-*7 lessons in this section.*
+## By the end of this section you can
+
+- Build a test suite that fails when the product breaks, not when the code is refactored.
+- Add smoke tests that exercise the deployed artefact, not just your laptop.
+- Build a small eval set with a threshold for an AI feature, and gate CI on it.
+- Write a definition of done you can actually check.
 
 ### [The Test Pyramid In Practice](10-Test-Pyramid)
-`beginner` · ~18 min — what each layer costs, catches, and misses.
+`beginner` · ~18 min — Tests are what let you move quickly without reading every line an agent wrote. Without them, "the agent says it works" is your entire verification story.
 
 ### [Testing With Agents](10-Testing-With-Agents)
-`intermediate` · ~18 min — Wiring the agent into red-green-refactor, and making CI the referee instead of the agent's word.
+`intermediate` · ~18 min — An agent can write a test suite in seconds.
 
 ### [Integration And Smoke Tests](10-Integration-And-Smoke-Tests)
-`intermediate` · ~18 min — the bugs unit tests cannot see.
+`intermediate` · ~18 min — A unit test runs in a process with no database, no environment variables and no network.
 
 ### [Evaluating AI Features](10-Evaluating-AI-Features)
-`advanced` · ~20 min — Why normal tests are not enough for non-deterministic features; what an eval is (a dataset + a scorer + a threshold).
+`advanced` · ~20 min — A normal test asserts one exact output. A feature that calls a model returns different words every time, so assert answer == "the expected sentence" is either flaky or useless.
 
 ### [Definition Of Done](10-Definition-Of-Done)
-`beginner` · ~12 min — A written definition of done for a small team, covering code, tests, docs, migrations, security, observability and rollback.
+`beginner` · ~12 min — "Done" drifts. You finish the code, the agent says it is done, the tests pass locally, and two days later production is missing a migration and nobody wrote the doc.
 
 ### [Debugging Discipline](10-Debugging-Discipline)
-`intermediate` · ~18 min — the four phases, in that order, with an artefact per phase.
+`intermediate` · ~18 min — The fastest way to waste an afternoon is to change code before you can reproduce the failure.
 
 ### [Quality Exercises](10-Quality-Exercises)
-`intermediate` · ~25 min — Write the smallest suite that catches a real bug in a toy repo; then deliberately break the code and check the suite fails.
+`intermediate` · ~25 min — Reading about verification does not build the reflex. These four exercises do. You write a suite small enough to finish in an hour, then deliberately break the code to prove the suite bites.
 
 ---
 
-Section 10 of 16 · [Home](Home) · [Sidebar index](_Sidebar)
+← [9. Safety & Security](09-Safety-And-Security) · [Home](Home) · [Sidebar](_Sidebar) · [11. Documentation](11-Documentation) →
+

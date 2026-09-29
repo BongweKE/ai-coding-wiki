@@ -1,6 +1,6 @@
 ### Coding With AI in the New Age
 
-**[Home](Home)** · [How to use](00-How-To-Use-This-Wiki) · [Glossary](00-Glossary)
+**[Home](Home)** · [How to use](00-How-To-Use-This-Wiki) · [Glossary](00-Glossary) · [30-day plan](15-30-Day-Learning-Plan)
 
 **[0. Start Here](00-Start-Here)**
 - [What Is AI Coding, Really?](00-What-Is-AI-Coding)
@@ -9,7 +9,7 @@
 - [How To Use This Wiki](00-How-To-Use-This-Wiki)
 - [Glossary](00-Glossary)
 
-**[1. Foundations: How AI Coding Works](01-Foundations)**
+**[1. Foundations](01-Foundations)**
 - [How LLMs Work For Coders](01-How-LLMs-Work-For-Coders)
 - [From Autocomplete To Agents](01-From-Autocomplete-To-Agents)
 - [The Agent Loop](01-The-Agent-Loop)
@@ -17,7 +17,7 @@
 - [A Taxonomy Of Context](01-Taxonomy-Of-Context)
 - [Choosing A Model](01-Choosing-Models)
 
-**[2. Prompting & Context Engineering](02-Prompting-And-Context)**
+**[2. Prompting & Context](02-Prompting-And-Context)**
 - [Prompting Fundamentals](02-Prompting-Fundamentals)
 - [Structuring Instructions](02-Structuring-Instructions)
 - [Showing Examples (Few-Shot)](02-Showing-Examples-Few-Shot)
@@ -28,7 +28,7 @@
 - [Prompt Anti-Patterns](02-Prompt-Anti-Patterns)
 - [Prompting Exercises](02-Prompting-Exercises)
 
-**[3. Agentic Coding Workflows](03-Agentic-Workflows)**
+**[3. Agentic Workflows](03-Agentic-Workflows)**
 - [The Feature Loop](03-The-Feature-Loop)
 - [Plan Mode And Spec-Driven Development](03-Plan-Mode-And-Spec-Driven-Development)
 - [TDD With Agents](03-TDD-With-Agents)
@@ -50,7 +50,7 @@
 - [Managing A Skill Library](04-Managing-A-Skill-Library)
 - [Skill Exercises](04-Skill-Exercises)
 
-**[5. Git & CI/CD with gh](05-Git-And-CICD)**
+**[5. Git & CI/CD](05-Git-And-CICD)**
 - [Git Essentials For The AI Era](05-Git-Essentials)
 - [GitHub CLI Quickstart](05-GitHub-CLI-Quickstart)
 - [Branching And Pull Requests](05-Branching-And-Pull-Requests)
@@ -65,7 +65,7 @@
 - [Deployment Pipelines](05-Deployment-Pipelines)
 - [CI Troubleshooting](05-CI-Troubleshooting)
 
-**[6. System Design & Architecture](06-System-Design)**
+**[6. System Design](06-System-Design)**
 - [Why Architecture Before Code](06-Why-Architecture-Before-Code)
 - [Thinking In Boundaries](06-Thinking-In-Boundaries)
 - [Diagrams As Code](06-Diagrams-As-Code)
@@ -79,7 +79,7 @@
 - [Scaling From One Instance](06-Scaling-From-One-Instance)
 - [Architecture Review With AI](06-Architecture-Review-With-AI)
 
-**[7. Shipping: Deploy & Operate](07-Shipping-And-Deploy)**
+**[7. Shipping & Deploy](07-Shipping-And-Deploy)**
 - [Deployment Concepts](07-Deployment-Concepts)
 - [Deploy On Railway](07-Deploy-On-Railway)
 - [Postgres On Neon](07-Postgres-On-Neon)
@@ -91,7 +91,7 @@
 - [Local To Cloud Walkthrough](07-Local-To-Cloud-Walkthrough)
 - [Deployment Exercises](07-Deployment-Exercises)
 
-**[8. MCP: Connecting Tools Safely](08-MCP)**
+**[8. MCP](08-MCP)**
 - [What Is MCP?](08-What-Is-MCP)
 - [MCP Architecture And Transports](08-MCP-Architecture)
 - [Using MCP In Practice](08-Using-MCP-In-Practice)
@@ -112,7 +112,7 @@
 - [Security Checklists](09-Security-Checklists)
 - [Security Exercises](09-Security-Exercises)
 
-**[10. Quality: Testing & Evals](10-Quality)**
+**[10. Quality](10-Quality)**
 - [The Test Pyramid In Practice](10-Test-Pyramid)
 - [Testing With Agents](10-Testing-With-Agents)
 - [Integration And Smoke Tests](10-Integration-And-Smoke-Tests)
@@ -121,7 +121,7 @@
 - [Debugging Discipline](10-Debugging-Discipline)
 - [Quality Exercises](10-Quality-Exercises)
 
-**[11. Documentation & Knowledge](11-Documentation)**
+**[11. Documentation](11-Documentation)**
 - [Docs As Code](11-Docs-As-Code)
 - [Writing A Great README](11-Writing-A-Great-README)
 - [Documentation Per Feature](11-Documentation-Per-Feature)
@@ -129,7 +129,7 @@
 - [Writing For Future You](11-Writing-For-Future-You)
 - [Documentation Exercises](11-Documentation-Exercises)
 
-**[12. Rules Of Operation: SOPs, ADRs, AGENTS.md & Skills](12-Rules-Of-Operation)**
+**[12. Rules Of Operation](12-Rules-Of-Operation)**
 - [Rules Of Operation: The Full Stack](12-Rules-Of-Operation-Overview)
 - [Writing SOPs](12-Writing-SOPs)
 - [ADRs In Practice](12-ADRs-In-Practice)
@@ -140,7 +140,7 @@
 - [Versioning And Release Notes](12-Versioning-And-Release-Notes)
 - [Rules Of Operation Exercises](12-Rules-Exercises)
 
-**[13. Team, Process & Economics](13-Team-And-Process)**
+**[13. Team & Process](13-Team-And-Process)**
 - [Issue-Driven Development](13-Issue-Driven-Development)
 - [Project Boards And Sprints](13-Project-Boards-And-Sprints)
 - [Code Review For AI Code](13-Code-Review-For-AI-Code)
@@ -148,14 +148,14 @@
 - [Team Ownership And CODEOWNERS](13-Team-Ownership-CODEOWNERS)
 - [Process Exercises](13-Process-Exercises)
 
-**[14. Case Studies (Anonymised Real Lessons)](14-Case-Studies)**
+**[14. Case Studies](14-Case-Studies)**
 - [Case Study: A Payments Platform](14-Case-Study-Payments-Platform)
 - [Case Study: A Multi-Agent RAG Assistant](14-Case-Study-Multi-Agent-RAG)
 - [Case Study: A Geospatial Compliance Platform](14-Case-Study-Geospatial-Compliance)
 - [Case Study: Running Agents As A Daily Practice](14-Case-Study-Agent-Operations)
 - [Case Study Synthesis: The Patterns That Repeat](14-Case-Study-Synthesis)
 
-**[15. Capstones & Next Steps](15-Capstones)**
+**[15. Capstones](15-Capstones)**
 - [Capstone 1: Ship A Tiny App](15-Capstone-1-Ship-A-Tiny-App)
 - [Capstone 2: Add An AI Feature Safely](15-Capstone-2-Add-An-AI-Feature)
 - [Capstone 3: Make A Repo Agent-Proof](15-Capstone-3-Agent-Proof-Repository)

@@ -2,7 +2,7 @@
 
 ## Why this matters
 
-Railway is the shortest path from a folder on your laptop to a URL someone else can open. It builds your code, runs it, injects your variables and gives you logs. The catch is that its convenience hides three or four decisions you still have to make deliberately — deploy path, variables, restart behaviour — and the default answers bite later. This page installs the CLI and walks the whole loop, including the failures that cost real hours.
+Railway is the shortest path from a folder on your laptop to a URL someone else can open. It builds your code, runs it, injects your variables and gives you logs. The catch is that its convenience hides three decisions you still have to make deliberately — deploy path, variables, restart behaviour — and the default answers bite later. This page walks the whole loop, including the failures that cost real hours.
 
 ![Deployment topology](https://raw.githubusercontent.com/BongweKE/ai-coding-wiki/main/assets/07-topology.png)
 
@@ -22,7 +22,7 @@ railway link          # prompts for project + environment
 railway status        # shows the linked project, service and environment
 ```
 
-Linking is per directory and stored locally. If a deploy went somewhere unexpected, run `railway status` before anything else.
+Linking is per directory and stored locally, so `railway status` is the first command to run when a deploy lands somewhere unexpected.
 
 ## Deploying from the CLI vs from a repo
 
@@ -49,7 +49,7 @@ Project tokens are scoped to one environment and can only do deployment work. Ke
 Set variables per environment, never in a committed file:
 
 ```bash
-railway variables --service my-api --environment staging
+railway variable list --service my-api --environment staging   # prints secret values — never paste the output
 railway variable set SERVICE_API_KEY=...REDACTED --service my-api --skip-deploys
 ```
 
@@ -79,7 +79,7 @@ For reliability, keep one config file and one instance. The config contract stat
 }
 ```
 
-Exact keys and accepted values live in the Railway docs root — this file is version-sensitive, so check it there rather than copying an old example. Start with **one instance**. Multiple replicas make in-process state (caches, event streams held in memory) wrong in ways that only appear under load; scale after you have measured, not before.
+Exact keys are version-sensitive; check them in the Railway docs rather than copying an old example. Start with **one instance**. Multiple replicas make in-process state (caches, event streams held in memory) wrong in ways that only appear under load; scale after you have measured, not before.
 
 ```mermaid
 flowchart TD
@@ -100,6 +100,7 @@ flowchart TD
 **A "failed" deploy that was skipped on purpose.** The platform reuses the previous build when the uploaded code is unchanged — for example a frontend-only change. There are no build logs to stream, so the CLI exits non-zero with a message about failing to retrieve the build log. That is a **skip, not a failure**: real build failures look different. If your pipeline treats every non-zero exit as failure, grep for the skip message and treat it as success, otherwise you will chase a phantom bug.
 
 **TLS that worked locally and fails in the container.** A minimal base image has no CA trust store. Local runtimes often ship their own certificate roots; a compiled binary inside a slim image reads the *system* store and fails with `CERTIFICATE_VERIFY_FAILED: unable to get local issuer certificate` on the first outbound HTTPS call. Install the CA package in the runtime stage:
+
 ```dockerfile
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates && rm -rf /var/lib/apt/lists/*
@@ -117,9 +118,8 @@ The general rule: the container is not your laptop, and network calls are where 
 
 ## Common mistakes
 
-- **Deploying to the wrong environment.** `railway status` first; link per folder so it cannot be ambiguous.
+- **Deploying to the wrong environment.** Run `railway status` first.
 - **Setting variables without `--skip-deploys`.** You get a surprise restart mid-rollout.
-- **Assuming a variable change is live.** Most processes only read the environment at startup.
 - **Adding a git trigger to a service your pipeline already deploys.** Two deploy paths, one of them ungated.
 - **Chasing a skipped deploy as an error.** Unchanged code means no build logs, and the CLI exits non-zero.
 - **Shipping a slim image without a CA trust store.** Every outbound HTTPS call fails only in production.
