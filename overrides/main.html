@@ -12,6 +12,13 @@
 
 {% block extrahead %}
   {{ super() }}
+  {#- bongwe.space's display face, used for headings by assets/stylesheets/
+      bongwe.css. Material loads only a text and a code family (theme.font
+      in mkdocs.yml), so the third face comes in here, preconnected. -#}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#FCF9F3">
   {% set social_image = config.extra.social_image %}
   {% set meta = page.meta if page and page.meta else {} %}
   {#- The homepage is titled "Home" in the nav; a link preview that says
