@@ -89,8 +89,24 @@ place pages are edited; the site and the GitHub wiki are outputs.
 ### Deploying the Cloudflare copy
 
 ```bash
-bash scripts/deploy_cloudflare.sh      # builds site/ from wiki/, then `wrangler deploy`
+bash scripts/vibe-deploy.sh            # gates, build, deploy, then verify every surface
+bash scripts/deploy_cloudflare.sh      # the same, without the verification pass
+bash scripts/enable-cloudflare-ci.sh   # store the CI credentials, so pushes deploy it for you
+bash scripts/enable-cloudflare-ci.sh status   # is CI actually publishing the domain?
 ```
+
+`vibe-deploy.sh` runs the gates, builds `site/`, calls `wrangler deploy`, and
+then checks the published result from the outside — pages, the 404 page,
+`og-card.png`, the sitemap, the GitHub Pages mirror, and whether the two copies
+are the same build. It creates `.venv` with Material for MkDocs if `mkdocs` is
+not on your PATH. Use `check` to verify without building or deploying.
+
+`enable-cloudflare-ci.sh` stores `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` as repository secrets (the token is read with
+`read -s`, piped to `gh`, and never echoed or written to disk), then triggers
+the docs workflow and reads the result back. Note it inspects the *step*
+conclusion: the Cloudflare job reports success even when its publish step is
+skipped, so a job-level check would claim a deploy that never happened.
 
 The Worker is declared in `wrangler.jsonc`: it serves `site/` as static assets
 and owns the `vibe.bongwe.space` custom domain. Two details worth keeping:
