@@ -24,7 +24,8 @@ Each lesson is 600–1000 words with one exercise, a diagram, the mistakes peopl
 | 0 | [Start Here](00-Start-Here) | What AI coding actually is, what the tools are, and a workbench that works. |
 | 1 | [Foundations](01-Foundations) | A correct mental model: models, tokens, context, the agent loop, and where agents are weak. |
 | 2 | [Prompting & Context](02-Prompting-And-Context) | Instructions and context an agent can actually execute — including the rules file loaded every session. |
-| 3 | [Agentic Workflows](03-Agentic-Workflows) | The daily craft: plan, implement, test, review, and keep diffs small enough to read. |
+| 3 | [Agentic Workflows](03-Agentic-Workflows) | The daily craft: plan, implement, test, review, and keep diffs small enough
+ to read. |
 | 4 | [Agent Skills](04-Agent-Skills) | Package know-how so any agent gets it right without being re-taught. |
 | 5 | [Git & CI/CD](05-Git-And-CICD) | Git, the GitHub CLI, workflows, the checks that matter, hardening, releases and deploys. |
 | 6 | [System Design](06-System-Design) | Design before code: boundaries, diagrams, state machines, ADRs, schemas, APIs, scale. |
@@ -45,7 +46,8 @@ Each lesson is 600–1000 words with one exercise, a diagram, the mistakes peopl
 2. **Small diffs, small steps.** Blast radius scales with diff size.
 3. **Test the deployed artefact**, not just your laptop.
 4. **Rules belong in the cheapest layer that works** — a rule, a skill, a hook, or a CI gate.
-5. **You own every line you commit**, whoever wrote it.
+5. **You own every line you commit**, whoeve
+r wrote it.
 
 ## Start here
 
@@ -60,6 +62,14 @@ Each lesson is 600–1000 words with one exercise, a diagram, the mistakes peopl
 - **Templates**: [AGENTS.md, ADR, SOP, PR template, CI workflows, SKILL.md](16-Templates).
 - **Cheat sheets**: [git](16-Git-Cheat-Sheet), [gh](16-GitHub-CLI-Cheat-Sheet), [Railway & Neon](16-Railway-And-Neon-Cheat-Sheet), [mermaid](16-Mermaid-Cookbook).
 - **Link index**: [every source used in this wiki](16-Link-Index).
+
+## Documentation site
+
+This repository also builds a searchable documentation site from `wiki/` using [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), deployed to GitHub Pages at **<https://bongweke.github.io/ai-coding-wiki/>**.
+
+- `wiki/` stays the source of truth for every page. The build copies it at build time and never modifies it, so `scripts/push_wiki.sh` (the GitHub wiki sync) keeps working unchanged.
+- Run it locally: `pip install "mkdocs-material>=9.5,<10" && bash scripts/build_site.sh`, then open `site/index.html`.
+- Deploys are automatic on every push to `main` that touches `wiki/` or the site config (see `.github/workflows/docs.yml`).
 
 ## Contributing and licence
 

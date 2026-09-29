@@ -1,0 +1,256 @@
+# Documentation site for the AI Coding Wiki.
+#
+# wiki/ is the source of truth for every page. The site builds from a
+# prepared copy (site-src/, made by scripts/build_site.sh) so that
+# scripts/push_wiki.sh — the sync to the GitHub wiki — keeps working
+# byte-for-byte, unchanged. Never edit site-src/ by hand.
+#
+# Custom domain: to serve the site at your own domain instead of
+# bongweke.github.io/ai-coding-wiki/:
+#   1. Add the domain in Settings -> Pages -> Custom domain.
+#   2. Update site_url below to the same domain.
+#   3. Enable "Enforce HTTPS" once the DNS check passes.
+
+site_name: Coding With AI in the New Age
+site_description: >-
+  A free, technical, bite-sized wiki for people who are new to software
+  engineering but want to build real things with AI coding agents —
+  and not get burned doing it.
+site_url: https://bongweke.github.io/ai-coding-wiki/
+repo_url: https://github.com/BongweKE/ai-coding-wiki
+repo_name: BongweKE/ai-coding-wiki
+edit_uri: edit/main/wiki/
+
+docs_dir: site-src
+site_dir: site
+
+# Flat URLs (page.html, not page/) keep the wiki-style relative links
+# resolvable; scripts/site_hook.py maps them to the built pages.
+use_directory_urls: false
+
+# Prepared copies and wiki chrome, not source pages:
+#   index.md is wiki/00-Home.md under its site name; _Sidebar.md and
+#   _Footer.md are GitHub-wiki navigation — the theme sidebar and
+#   prev/next navigation replace them.
+exclude_docs: |
+  00-Home.md
+  _Sidebar.md
+  _Footer.md
+
+# Rewrite GitHub-wiki-style links ([label](Page-Name)) to site URLs at
+# build time, so wiki/ pages never need .md links (check_wiki.py
+# rejects them, and the GitHub wiki wants page names).
+hooks:
+  - scripts/site_hook.py
+
+theme:
+  name: material
+  features:
+    - navigation.top
+    - navigation.tracking
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.details
+  - pymdownx.emoji
+
+# Generated from wiki/_Sidebar.md — the same order as the wiki navigation.
+nav:
+  - Home: index.md
+  - '0. Start Here':
+      - Overview: 00-Start-Here.md
+      - 'What Is AI Coding, Really?': 00-What-Is-AI-Coding.md
+      - 'The AI Coding Landscape': 00-The-AI-Coding-Landscape.md
+      - 'Set Up Your Workbench': 00-Setup-Your-Workbench.md
+      - 'How To Use This Wiki': 00-How-To-Use-This-Wiki.md
+      - 'Glossary': 00-Glossary.md
+  - '1. Foundations':
+      - Overview: 01-Foundations.md
+      - 'How LLMs Work For Coders': 01-How-LLMs-Work-For-Coders.md
+      - 'From Autocomplete To Agents': 01-From-Autocomplete-To-Agents.md
+      - 'The Agent Loop': 01-The-Agent-Loop.md
+      - 'What Agents Are Good And Bad At': 01-What-Agents-Are-Good-And-Bad-At.md
+      - 'A Taxonomy Of Context': 01-Taxonomy-Of-Context.md
+      - 'Choosing A Model': 01-Choosing-Models.md
+  - '2. Prompting & Context':
+      - Overview: 02-Prompting-And-Context.md
+      - 'Prompting Fundamentals': 02-Prompting-Fundamentals.md
+      - 'Structuring Instructions': 02-Structuring-Instructions.md
+      - 'Showing Examples (Few-Shot)': 02-Showing-Examples-Few-Shot.md
+      - 'Reasoning And Chain Of Thought': 02-Reasoning-And-Chain-Of-Thought.md
+      - 'Context Engineering': 02-Context-Engineering.md
+      - 'Rules Files: AGENTS.md And CLAUDE.md': 02-Rules-Files-AGENTS-and-CLAUDE-md.md
+      - 'Prompt Patterns Cookbook': 02-Prompt-Patterns-Cookbook.md
+      - 'Prompt Anti-Patterns': 02-Prompt-Anti-Patterns.md
+      - 'Prompting Exercises': 02-Prompting-Exercises.md
+  - '3. Agentic Workflows':
+      - Overview: 03-Agentic-Workflows.md
+      - 'The Feature Loop': 03-The-Feature-Loop.md
+      - 'Plan Mode And Spec-Driven Development': 03-Plan-Mode-And-Spec-Driven-Development.md
+      - 'TDD With Agents': 03-TDD-With-Agents.md
+      - 'Keeping Diffs Small': 03-Keeping-Diffs-Small.md
+      - 'Agentic Debugging': 03-Agentic-Debugging.md
+      - 'Refactoring Safely': 03-Refactoring-Safely.md
+      - 'Subagents And Parallel Work': 03-Subagents-And-Parallel-Work.md
+      - 'Agent Memory And Session Hygiene': 03-Agent-Memory-And-Session-Hygiene.md
+      - 'Hooks And Guardrails': 03-Hooks-And-Guardrails.md
+      - 'Reviewing Agent Output': 03-Reviewing-Agent-Output.md
+      - 'Token And Cost Discipline': 03-Token-And-Cost-Discipline.md
+      - 'Agentic Exercises': 03-Agentic-Exercises.md
+  - '4. Agent Skills':
+      - Overview: 04-Agent-Skills.md
+      - 'What Are Agent Skills?': 04-What-Are-Agent-Skills.md
+      - 'Anatomy Of A SKILL.md': 04-Anatomy-Of-A-Skill-File.md
+      - 'Writing Good Skills': 04-Writing-Good-Skills.md
+      - 'Skill Quality And Anti-Patterns': 04-Skill-Quality-And-Anti-Patterns.md
+      - 'Managing A Skill Library': 04-Managing-A-Skill-Library.md
+      - 'Skill Exercises': 04-Skill-Exercises.md
+  - '5. Git & CI/CD':
+      - Overview: 05-Git-And-CICD.md
+      - 'Git Essentials For The AI Era': 05-Git-Essentials.md
+      - 'GitHub CLI Quickstart': 05-GitHub-CLI-Quickstart.md
+      - 'Branching And Pull Requests': 05-Branching-And-Pull-Requests.md
+      - 'Writing GitHub Actions': 05-Writing-GitHub-Actions.md
+      - 'Your First CI Pipeline': 05-Your-First-CI-Pipeline.md
+      - 'Checks That Actually Matter': 05-Checks-That-Actually-Matter.md
+      - 'Fast And Reliable Checks': 05-Fast-And-Reliable-Checks.md
+      - 'Branch Protection And Required Checks': 05-Branch-Protection-And-Required-Checks.md
+      - 'Secrets In CI': 05-Secrets-In-CI.md
+      - 'Hardening GitHub Actions': 05-Hardening-GitHub-Actions.md
+      - 'Releases, Tags And Versioning': 05-Releases-Tags-And-Versioning.md
+      - 'Deployment Pipelines': 05-Deployment-Pipelines.md
+      - 'CI Troubleshooting': 05-CI-Troubleshooting.md
+  - '6. System Design':
+      - Overview: 06-System-Design.md
+      - 'Why Architecture Before Code': 06-Why-Architecture-Before-Code.md
+      - 'Thinking In Boundaries': 06-Thinking-In-Boundaries.md
+      - 'Diagrams As Code': 06-Diagrams-As-Code.md
+      - 'State Machines For Real Features': 06-State-Machines-For-Features.md
+      - 'Architecture Decision Records': 06-Architecture-Decision-Records.md
+      - 'Data Modeling Basics': 06-Data-Modeling-Basics.md
+      - 'API Design Basics': 06-API-Design-Basics.md
+      - 'Reliability Patterns': 06-Reliability-Patterns.md
+      - 'Security Architecture': 06-Security-Architecture.md
+      - 'Observability': 06-Observability.md
+      - 'Scaling From One Instance': 06-Scaling-From-One-Instance.md
+      - 'Architecture Review With AI': 06-Architecture-Review-With-AI.md
+  - '7. Shipping & Deploy':
+      - Overview: 07-Shipping-And-Deploy.md
+      - 'Deployment Concepts': 07-Deployment-Concepts.md
+      - 'Deploy On Railway': 07-Deploy-On-Railway.md
+      - 'Postgres On Neon': 07-Postgres-On-Neon.md
+      - 'Edge With Cloudflare Workers': 07-Edge-With-Cloudflare-Workers.md
+      - 'Object Storage And Artifacts': 07-Object-Storage-And-Artifacts.md
+      - 'Environments And Promotion': 07-Environments-And-Promotion.md
+      - 'Rollbacks And Incidents': 07-Rollbacks-And-Incidents.md
+      - 'Cost Control For Side Projects': 07-Cost-Control.md
+      - 'Local To Cloud Walkthrough': 07-Local-To-Cloud-Walkthrough.md
+      - 'Deployment Exercises': 07-Deployment-Exercises.md
+  - '8. MCP':
+      - Overview: 08-MCP.md
+      - 'What Is MCP?': 08-What-Is-MCP.md
+      - 'MCP Architecture And Transports': 08-MCP-Architecture.md
+      - 'Using MCP In Practice': 08-Using-MCP-In-Practice.md
+      - 'MCP Security Risks': 08-MCP-Security-Risks.md
+      - 'Safe MCP Adoption Checklist': 08-Safe-MCP-Checklist.md
+      - 'MCP Exercises': 08-MCP-Exercises.md
+  - '9. Safety & Security':
+      - Overview: 09-Safety-And-Security.md
+      - 'Threat-Modeling Your AI Workflow': 09-Threat-Modeling-Your-Workflow.md
+      - 'Secrets Hygiene': 09-Secrets-Hygiene.md
+      - 'Secure Code Generation': 09-Secure-Code-Generation.md
+      - 'Prompt Injection And Exfiltration': 09-Prompt-Injection-And-Exfiltration.md
+      - 'Supply Chain Security': 09-Supply-Chain-Security.md
+      - 'OWASP LLM Top 10 In Plain English': 09-OWASP-LLM-Top-10.md
+      - 'OWASP Agentic Threats': 09-OWASP-Agentic-Threats.md
+      - 'Privacy And Compliance Basics': 09-Privacy-And-Compliance.md
+      - 'Human Accountability': 09-Human-Accountability.md
+      - 'Security Checklists': 09-Security-Checklists.md
+      - 'Security Exercises': 09-Security-Exercises.md
+  - '10. Quality':
+      - Overview: 10-Quality.md
+      - 'The Test Pyramid In Practice': 10-Test-Pyramid.md
+      - 'Testing With Agents': 10-Testing-With-Agents.md
+      - 'Integration And Smoke Tests': 10-Integration-And-Smoke-Tests.md
+      - 'Evaluating AI Features': 10-Evaluating-AI-Features.md
+      - 'Definition Of Done': 10-Definition-Of-Done.md
+      - 'Debugging Discipline': 10-Debugging-Discipline.md
+      - 'Quality Exercises': 10-Quality-Exercises.md
+  - '11. Documentation':
+      - Overview: 11-Documentation.md
+      - 'Docs As Code': 11-Docs-As-Code.md
+      - 'Writing A Great README': 11-Writing-A-Great-README.md
+      - 'Documentation Per Feature': 11-Documentation-Per-Feature.md
+      - 'Lesson Banks And Retros': 11-Lesson-Banks-And-Retros.md
+      - 'Writing For Future You': 11-Writing-For-Future-You.md
+      - 'Documentation Exercises': 11-Documentation-Exercises.md
+  - '12. Rules Of Operation':
+      - Overview: 12-Rules-Of-Operation.md
+      - 'Rules Of Operation: The Full Stack': 12-Rules-Of-Operation-Overview.md
+      - 'Writing SOPs': 12-Writing-SOPs.md
+      - 'ADRs In Practice': 12-ADRs-In-Practice.md
+      - 'AGENTS.md That Actually Works': 12-AGENTS-md-That-Works.md
+      - 'Skills As Operating Rules': 12-Skills-As-Operating-Rules.md
+      - 'Creating Skills With Hermes': 12-Creating-Skills-With-Hermes.md
+      - 'Change Tracking': 12-Change-Tracking.md
+      - 'Versioning And Release Notes': 12-Versioning-And-Release-Notes.md
+      - 'Rules Of Operation Exercises': 12-Rules-Exercises.md
+  - '13. Team & Process':
+      - Overview: 13-Team-And-Process.md
+      - 'Issue-Driven Development': 13-Issue-Driven-Development.md
+      - 'Project Boards And Sprints': 13-Project-Boards-And-Sprints.md
+      - 'Code Review For AI Code': 13-Code-Review-For-AI-Code.md
+      - 'Token Economics And Budgets': 13-Token-Economics-And-Budgets.md
+      - 'Team Ownership And CODEOWNERS': 13-Team-Ownership-CODEOWNERS.md
+      - 'Process Exercises': 13-Process-Exercises.md
+  - '14. Case Studies':
+      - Overview: 14-Case-Studies.md
+      - 'Case Study: A Payments Platform': 14-Case-Study-Payments-Platform.md
+      - 'Case Study: A Multi-Agent RAG Assistant': 14-Case-Study-Multi-Agent-RAG.md
+      - 'Case Study: A Geospatial Compliance Platform': 14-Case-Study-Geospatial-Compliance.md
+      - 'Case Study: Running Agents As A Daily Practice': 14-Case-Study-Agent-Operations.md
+      - 'Case Study Synthesis: The Patterns That Repeat': 14-Case-Study-Synthesis.md
+  - '15. Capstones':
+      - Overview: 15-Capstones.md
+      - 'Capstone 1: Ship A Tiny App': 15-Capstone-1-Ship-A-Tiny-App.md
+      - 'Capstone 2: Add An AI Feature Safely': 15-Capstone-2-Add-An-AI-Feature.md
+      - 'Capstone 3: Make A Repo Agent-Proof': 15-Capstone-3-Agent-Proof-Repository.md
+      - 'The 30-Day Learning Plan': 15-30-Day-Learning-Plan.md
+      - 'Further Learning': 15-Further-Learning.md
+      - 'Contributing To This Wiki': 15-Contributing-To-This-Wiki.md
+  - '16. Reference':
+      - Overview: 16-Reference.md
+      - 'Git Cheat Sheet': 16-Git-Cheat-Sheet.md
+      - 'GitHub CLI Cheat Sheet': 16-GitHub-CLI-Cheat-Sheet.md
+      - 'Railway And Neon Cheat Sheet': 16-Railway-And-Neon-Cheat-Sheet.md
+      - 'Mermaid Cookbook': 16-Mermaid-Cookbook.md
+      - 'Templates': 16-Templates.md
+      - 'Link Index': 16-Link-Index.md
