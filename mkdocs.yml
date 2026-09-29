@@ -43,6 +43,18 @@ exclude_docs: |
 hooks:
   - scripts/site_hook.py
 
+# Fail loudly on links MkDocs cannot resolve. `use_directory_urls: false`
+# plus the wiki-style links rewritten by scripts/site_hook.py mean a
+# mistyped target would otherwise ship silently — MkDocs' default levels
+# are lenient. scripts/build_site.sh runs `mkdocs build --strict`, so a
+# warning here fails the build.
+validation:
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    absolute_links: warn
+  anchors: warn
+
 theme:
   name: material
   features:
