@@ -14,7 +14,9 @@
   {{ super() }}
   {% set social_image = config.extra.social_image %}
   {% set meta = page.meta if page and page.meta else {} %}
-  {% set social_title = page.title if page and page.title else config.site_name %}
+  {#- The homepage is titled "Home" in the nav; a link preview that says
+      "Home" names nothing. Previews of the homepage carry the site name. -#}
+  {% set social_title = page.title if page and page.title and not page.is_homepage else config.site_name %}
   {% set social_description = meta.description | default(config.site_description, true) %}
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ config.site_name }}">

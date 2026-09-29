@@ -18,6 +18,10 @@ Rules:
   * Fragments (#anchor) are not verified: MkDocs already validates anchors
     through the `validation:` block in mkdocs.yml.
   * Every local <img src> and <script src> must exist too.
+  * og:image is emitted as a site-absolute URL (mkdocs.yml `extra`), and a
+    broken one is invisible in the page, so same-origin og:image URLs are
+    checked too: the origin is stripped and the path resolved like any
+    other absolute link. Foreign og:image URLs are left alone.
 
 Exits non-zero on the first failure set, so CI fails the build.
 """
@@ -32,15 +36,17 @@ ATTR = re.compile(r'<(?:a|img|script|link)\b[^>]*?\b(?:href|src)="([^"]*)"', re.
 OG_IMAGE = re.compile(r'<meta\s+property="og:image"\s+content="([^"]*)"', re.I)
 
 
-def local_targets(path):
+def local_targets(path, origin=""):
     html = open(path, encoding="utf-8", errors="replace").read()
-    for raw in ATTR.findall(html) + OG_IMAGE.findall(html):
+    for raw in ATTR.findall(html):
         url = raw.strip()
-        if not url or url.startswith("#"):
-            continue
-        if url.startswith(SKIP_SCHEMES) and "og:image" not in raw:
+        if not url or url.startswith("#") or url.startswith(SKIP_SCHEMES):
             continue
         yield url
+    for raw in OG_IMAGE.findall(html):
+        url = raw.strip()
+        if origin and url.startswith(origin + "/"):
+            yield url[len(origin):] or "/"
 
 
 def resolves(site_dir, page_path, url, base_path="/"):
@@ -62,23 +68,34 @@ def resolves(site_dir, page_path, url, base_path="/"):
     return False
 
 
-def site_base_path():
-    """The path prefix the site is published under, from site_url in mkdocs.yml.
+def _site_url():
+    """The site_url line from mkdocs.yml, or ''.
 
     Read with a regex rather than a YAML parser: mkdocs.yml uses
     `!!python/name:` tags, which a safe loader refuses.
     """
-    from urllib.parse import urlparse
-
     try:
         text = open("mkdocs.yml", encoding="utf-8").read()
     except OSError:
-        return "/"
+        return ""
     m = re.search(r"^site_url:\s*(\S+)\s*$", text, re.M)
-    if not m:
-        return "/"
-    path = urlparse(m.group(1)).path or "/"
+    return m.group(1) if m else ""
+
+
+def site_base_path():
+    """The path prefix the site is published under, from site_url in mkdocs.yml."""
+    from urllib.parse import urlparse
+
+    path = urlparse(_site_url()).path or "/"
     return path if path.endswith("/") else path + "/"
+
+
+def site_origin():
+    """The scheme://host the site is served under, from site_url in mkdocs.yml."""
+    from urllib.parse import urlparse
+
+    o = urlparse(_site_url())
+    return o.scheme + "://" + o.netloc if o.scheme and o.netloc else ""
 
 
 def main():
@@ -95,9 +112,10 @@ def main():
 
     broken, checked = [], 0
     base_path = site_base_path()
+    origin = site_origin()
     for page in sorted(pages):
         seen = set()
-        for url in local_targets(page):
+        for url in local_targets(page, origin):
             checked += 1
             if (url) in seen:
                 continue

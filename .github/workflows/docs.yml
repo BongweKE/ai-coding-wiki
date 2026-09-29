@@ -2,6 +2,11 @@ name: docs site
 
 # Build the documentation site from wiki/ and deploy it to GitHub Pages.
 # wiki/ is the source of truth; this pipeline only reads it.
+#
+# pull_request runs the build job only — the deploy jobs below carry an
+# `if: github.event_name != 'pull_request'` guard — so a PR that breaks the
+# build (an unresolved link, a missing asset) fails its checks instead of
+# failing main after merge.
 
 on:
   push:
@@ -11,6 +16,20 @@ on:
       - 'mkdocs.yml'
       - 'scripts/site_hook.py'
       - 'scripts/build_site.sh'
+      - 'scripts/check_site.py'
+      - 'scripts/gen_llms_txt.py'
+      - 'overrides/**'
+      - 'assets/**'
+      - 'cloudflare/**'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'wiki/**'
+      - 'mkdocs.yml'
+      - 'scripts/**'
+      - 'overrides/**'
+      - 'assets/**'
+      - 'cloudflare/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
@@ -61,6 +80,7 @@ jobs:
   deploy:
     name: deploy to GitHub Pages
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -81,6 +101,7 @@ jobs:
   cloudflare:
     name: deploy to vibe.bongwe.space (optional)
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
