@@ -95,6 +95,34 @@ def table(headers, rows):
 
 FOOT = "Coding With AI in the New Age · github.com/BongweKE/ai-coding-wiki"
 
+# Social/Open Graph card. 1200x630 is the size link previews expect, so it is
+# rendered separately from the 1600x900 infographics rather than added to CARDS.
+SOCIAL_W, SOCIAL_H = 1200, 630
+OG_HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1200px;height:630px;background:#0d1117;color:#e6edf3;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between}
+.kicker{font-size:18px;color:#2dd4bf;font-weight:700;letter-spacing:1.6px;text-transform:uppercase}
+h1{font-size:64px;line-height:1.05;font-weight:800;letter-spacing:-1.4px;margin-top:16px}
+h1 em{color:#2dd4bf;font-style:normal}
+p{font-size:23px;color:#8b949e;line-height:1.42;max-width:960px;margin-top:18px}
+.row{display:flex;gap:10px;margin-top:24px}
+.pill{font-size:17px;font-weight:600;border-radius:999px;padding:6px 14px;border:1px solid #30363d;color:#c9d1d9}
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:18px;color:#6e7681;
+ border-top:1px solid #21262d;padding-top:18px}
+</style></head><body>
+<div>
+<div class="kicker">Free &middot; technical &middot; beginner to advanced</div>
+<h1>Coding With AI<br>in the <em>New Age</em></h1>
+<p>A bite-sized wiki for building real things with AI coding agents &mdash; prompting, agentic
+workflows, CI/CD, security, evals and shipping. 135+ short lessons, four learning paths.</p>
+<div class="row"><span class="pill">Start here</span><span class="pill">30-day plan</span>
+<span class="pill">Three capstones</span><span class="pill">Cheat sheets</span></div>
+</div>
+<div class="foot"><span>vibe.bongwe.space</span><span>github.com/BongweKE/ai-coding-wiki</span></div>
+</body></html>"""
+
 CARDS = {}
 
 # ---- 00
@@ -504,7 +532,18 @@ def build():
         else:
             print(f"  FAIL {name}: {r.stderr.strip()[:200]}")
     print(f"{ok}/{len(CARDS)} infographics written to {OUT}")
-    return 0 if ok == len(CARDS) else 1
+
+    # The social card: same renderer, different canvas.
+    hp = os.path.join(tmp, "og-card.html")
+    open(hp, "w").write(OG_HTML)
+    png = os.path.join(OUT, "og-card.png")
+    r = subprocess.run([chrome, "--headless", "--disable-gpu", "--no-sandbox", "--hide-scrollbars",
+                        f"--window-size={SOCIAL_W},{SOCIAL_H}", "--force-device-scale-factor=1",
+                        f"--screenshot={png}", "file://" + hp],
+                       capture_output=True, text=True, timeout=120)
+    social_ok = os.path.exists(png) and os.path.getsize(png) > 5000
+    print(f"  {'ok  ' if social_ok else 'FAIL'} og-card.png (social preview)")
+    return 0 if ok == len(CARDS) and social_ok else 1
 
 
 if __name__ == "__main__":

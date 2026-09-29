@@ -1,0 +1,23 @@
+{
+  // The wiki's own URL: https://vibe.bongwe.space
+  //
+  // A Worker serving the built site as static assets, because the zone's DNS
+  // is already managed by Cloudflare and this is the one deployment path that
+  // provisions the record and the certificate itself (a Pages custom domain
+  // stayed "pending: CNAME record not set" — the API token has no DNS:Edit).
+  //
+  // Deploy: bash scripts/deploy_cloudflare.sh   (builds, then deploys site/)
+  // Note the route below: a wildcard *.bongwe.space route belongs to another
+  // Worker and takes precedence over the custom domain, so the more specific
+  // route must exist for this hostname to reach this Worker.
+  "name": "ai-coding-wiki",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./site",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "vibe.bongwe.space", "custom_domain": true },
+    { "pattern": "vibe.bongwe.space/*", "zone_name": "bongwe.space" }
+  ]
+}

@@ -1,0 +1,34 @@
+{#-
+  Link previews (Open Graph / Twitter cards).
+
+  Material emits only <meta name="description"> and the canonical link, so
+  social previews get a bare title. This override adds the tags link
+  unfurlers actually read, using the per-page description set by
+  scripts/site_hook.py and the social image in mkdocs.yml `extra`.
+
+  `page` is None when MkDocs renders 404.html, hence the guards.
+-#}
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  {% set social_image = config.extra.social_image %}
+  {% set meta = page.meta if page and page.meta else {} %}
+  {% set social_title = page.title if page and page.title else config.site_name %}
+  {% set social_description = meta.description | default(config.site_description, true) %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ social_title }}">
+  <meta property="og:description" content="{{ social_description }}">
+  <meta property="og:url" content="{{ page.canonical_url if page and page.canonical_url else config.site_url }}">
+  {% if social_image %}
+    <meta property="og:image" content="{{ social_image }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ config.site_name }} — a free, technical wiki for building with AI coding agents">
+  {% endif %}
+  <meta name="twitter:card" content="{% if social_image %}summary_large_image{% else %}summary{% endif %}">
+  <meta name="twitter:title" content="{{ social_title }}">
+  <meta name="twitter:description" content="{{ social_description }}">
+  {% if social_image %}<meta name="twitter:image" content="{{ social_image }}">{% endif %}
+{% endblock %}

@@ -75,3 +75,42 @@ This repository also builds a searchable documentation site from `wiki/` using [
 
 Issues and pull requests are welcome — see [Contributing](15-Contributing-To-This-Wiki) and the house style in `STYLE.md`. Text is CC BY 4.0; the scripts and tools are MIT. Nothing here is legal, financial or security advice for your specific system: adapt it, and verify it yourself.
 
+## Where this wiki is published
+
+One source (`wiki/`), built once, served in three places. `wiki/` is the only
+place pages are edited; the site and the GitHub wiki are outputs.
+
+| Surface | URL | Updated by | Role |
+|---|---|---|---|
+| Documentation site (canonical) | <https://vibe.bongwe.space> | Cloudflare Worker, assets from `site/` | The URL to share. `site_url` in `mkdocs.yml` points here. |
+| Documentation site (mirror) | <https://bongweke.github.io/ai-coding-wiki/> | GitHub Actions (`.github/workflows/docs.yml`) | Always up; needs no secrets. |
+| GitHub wiki | <https://github.com/BongweKE/ai-coding-wiki/wiki> | `bash scripts/push_wiki.sh` | Compatibility surface for people who land on the wiki tab. |
+
+### Deploying the Cloudflare copy
+
+```bash
+bash scripts/deploy_cloudflare.sh      # builds site/ from wiki/, then `wrangler deploy`
+```
+
+The Worker is declared in `wrangler.jsonc`: it serves `site/` as static assets
+and owns the `vibe.bongwe.space` custom domain. Two details worth keeping:
+
+- The zone also has a wildcard route (`*.bongwe.space/*`) belonging to another
+  Worker, and a route takes precedence over a custom domain. The explicit
+  `vibe.bongwe.space/*` route in `wrangler.jsonc` is what keeps the domain on
+  this Worker; deleting it sends the hostname to the other site.
+- Deploying from CI needs a `CLOUDFLARE_API_TOKEN` repository secret
+  (`gh secret set CLOUDFLARE_API_TOKEN`) plus `CLOUDFLARE_ACCOUNT_ID`. Without
+  them the Cloudflare job skips and only the mirror updates, so the two copies
+  can drift — run the script by hand after a content change until the secret exists.
+
+### Gates before either site publishes
+
+```bash
+python3 scripts/check_wiki.py --strict   # structure, links, assets, mermaid, secrets, manifest counts
+bash scripts/build_site.sh               # mkdocs build --strict, then scripts/check_site.py on the output
+```
+
+`check_wiki.py` is offline by design; external link rot is caught by the
+scheduled `external links` workflow (lychee), which is in report-only mode until
+the baseline is clean.

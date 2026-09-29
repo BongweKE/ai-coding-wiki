@@ -22,6 +22,22 @@ Bad prompts look productive. You get an answer, you paste another prompt, you ge
 
 **Eyeballing docs instead of running them.** Documentation is a claim, not proof. "Documented" is not "available" — a documented model, endpoint or flag may be disabled, deprecated or wrong for your version. Run the thing.
 
+The thirty-second check before you send anything:
+
+```mermaid
+flowchart TD
+    A["You are about to send a prompt"] --> B{"Does it name the symptom, the file and what fixed looks like?"}
+    B -- "no" --> C["Vague ask: the agent fixes a different bug"]
+    B -- "yes" --> D{"One requirement, or twelve?"}
+    D -- "twelve" --> E["Mega-prompt: split it, nothing gets done well"]
+    D -- "one or two" --> F{"Can you name the command that proves it?"}
+    F -- "no" --> G["No success criteria: you cannot review the result"]
+    F -- "yes" --> H["Send it, then read the diff, tests included"]
+    H --> I{"Green run and an honest diff?"}
+    I -- "no" --> J["Weakened assertion, deleted case, or the thing under test mocked away"]
+    I -- "yes" --> K["Merge"]
+```
+
 ## Prompt-injection-shaped mistakes in everyday use
 
 This one is subtle because it does not feel like security. You paste an issue body, a stack trace from a customer, a log line, or a fetched web page into your prompt. Somewhere in that text is a sentence that reads like an instruction.

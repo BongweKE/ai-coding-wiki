@@ -20,6 +20,20 @@ Progressive disclosure only pays off if the top level stays thin. A body of 900 
 
 Split, but verify the split. One maintainer split a bloated skill from roughly 11,000 words down to about a third of that by moving whole sections into `references/`, then checked the result by diffing the surviving headings and tokens against the original. Their rule, now enforced across a library of skills: keep every skill under about 5,000 words. Before moving a section out, list the headings it contained, paste them into the reference file's top comment, and confirm the count afterwards.
 
+How much of a skill loads, and when. That budget is what "keep it small" is protecting:
+
+```mermaid
+flowchart TD
+    A["Session starts"] --> B["Every installed skill loads its name and description, nothing more"]
+    B --> C{"Does a description match the task?"}
+    C -- "no" --> D["The body never loads: it costs you nothing"]
+    C -- "yes" --> E["SKILL.md body loads on demand"]
+    E --> F{"Does the task need a reference, script or template?"}
+    F -- "no" --> G["Stop there, the body was enough"]
+    F -- "yes" --> H["That one sibling file loads"]
+    H --> I["Update the skill when the code it describes moves, or it starts lying"]
+```
+
 ## Encode failures, not theory
 
 Every pitfall in a skill should be one that cost someone real time. Two shapes worth recognising, both generalised from shipped projects:

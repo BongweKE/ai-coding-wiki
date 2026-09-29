@@ -1,0 +1,24 @@
+{#-
+  A 404 page that works on both hosts the site is published to.
+
+  Links are absolute (config.site_url), so the same page is useful on the
+  canonical domain and on the github.io mirror. scripts/check_site.py
+  verifies these targets exist in the built output.
+-#}
+{% extends "main.html" %}
+
+{% block content %}
+  <h1>Page not found</h1>
+
+  <p>That page does not exist — the link may be from an older version, or it may have a typo.
+  Head back to the <a href="{{ config.site_url }}">home page</a>, or use the search box at the top
+  of the page (press <code>/</code>).</p>
+
+  <p>Common starting points:</p>
+  <ul>
+    <li><a href="{{ config.site_url }}00-Start-Here.html">Start here</a> — the four learning paths.</li>
+    <li><a href="{{ config.site_url }}15-30-Day-Learning-Plan.html">The 30-day plan</a> — a dated schedule.</li>
+    <li><a href="{{ config.site_url }}01-Foundations.html">Foundations</a> — how AI coding actually works.</li>
+    <li><a href="{{ config.site_url }}16-Link-Index.html">Link index</a> — every external source in one place.</li>
+  </ul>
+{% endblock %}

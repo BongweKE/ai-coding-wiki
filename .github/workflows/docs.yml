@@ -50,6 +50,14 @@ jobs:
         with:
           path: site
 
+      # The same build is handed to the Cloudflare job below, which serves
+      # https://vibe.bongwe.space.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+          retention-days: 7
+
   deploy:
     name: deploy to GitHub Pages
     needs: build
@@ -60,3 +68,44 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Optional: publish the same build to https://vibe.bongwe.space (a Cloudflare
+  # Worker serving site/ as static assets, config in wrangler.jsonc).
+  #
+  # It needs two repository secrets — CLOUDFLARE_API_TOKEN (Workers Scripts:Edit,
+  # Workers Routes:Edit) and CLOUDFLARE_ACCOUNT_ID. Without them this job skips
+  # with a notice, and the GitHub Pages mirror above is still the live site.
+  #
+  #   gh secret set CLOUDFLARE_API_TOKEN
+  #   gh secret set CLOUDFLARE_ACCOUNT_ID --body 5a8fcb0172160f4cb5479d5fb4cb62cd
+  cloudflare:
+    name: deploy to vibe.bongwe.space (optional)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: site
+
+      - name: Is a Cloudflare token configured?
+        id: cf
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN is not set — skipping the vibe.bongwe.space deploy. The GitHub Pages mirror is still updated."
+          fi
+
+      - name: Publish to Cloudflare
+        if: steps.cf.outputs.enabled == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

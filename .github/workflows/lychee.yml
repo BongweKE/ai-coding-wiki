@@ -1,0 +1,42 @@
+name: external links
+
+# 16-Link-Index.md promises that "a link check runs as part of the release
+# process". This is that job. scripts/check_wiki.py is offline by design, so
+# link rot is the one gate it cannot cover.
+#
+# Runs weekly and whenever a page or the link index changes. It is
+# continue-on-error while the baseline is being cleaned up: flip `fail` to
+# true (and delete `continue-on-error`) once a run is green, so a 404 in a
+# cited source fails the build like any other broken link.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"        # Mondays, 06:17 UTC (09:17 EAT)
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "wiki/16-Link-Index.md"
+      - ".github/workflows/lychee.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    name: check external links
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # 403s from bot-protected sites are not broken links; 429 is rate
+          # limiting. --max-retries keeps transient failures out of the report.
+          args: >-
+            --no-progress --max-retries 2 --accept 200,206,403,429
+            --exclude-all-private --exclude-path node_modules
+            "wiki/**/*.md" "README.md" "CONTRIBUTING.md"
+          fail: false

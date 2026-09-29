@@ -27,13 +27,18 @@ import sys
 
 SKIP_SCHEMES = ("http://", "https://", "mailto:", "tel:", "javascript:", "data:", "//")
 ATTR = re.compile(r'<(?:a|img|script|link)\b[^>]*?\b(?:href|src)="([^"]*)"', re.I)
+# Link previews are emitted as <meta property="og:image" content="...">; a broken
+# one is invisible in the page, so check it here too.
+OG_IMAGE = re.compile(r'<meta\s+property="og:image"\s+content="([^"]*)"', re.I)
 
 
 def local_targets(path):
     html = open(path, encoding="utf-8", errors="replace").read()
-    for raw in ATTR.findall(html):
+    for raw in ATTR.findall(html) + OG_IMAGE.findall(html):
         url = raw.strip()
-        if not url or url.startswith("#") or url.startswith(SKIP_SCHEMES):
+        if not url or url.startswith("#"):
+            continue
+        if url.startswith(SKIP_SCHEMES) and "og:image" not in raw:
             continue
         yield url
 

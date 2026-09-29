@@ -41,6 +41,22 @@ LINK = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)\)")
 # Pages that exist in the wiki under a different name than in wiki/ (the wiki landing page).
 ALIASES = {"Home": "00-Home.md", "_Sidebar": "_Sidebar.md", "_Footer": "_Footer.md"}
 
+# Pages where a diagram would be decoration rather than teaching: exercises
+# (they drive the reader through the lessons that already have the diagrams)
+# and pure lookup/reference pages. Keep this list short and justified.
+DIAGRAM_EXEMPT_SUFFIXES = ("-Exercises.md",)
+DIAGRAM_EXEMPT_PAGES = {
+    "00-Glossary.md",              # definitions lookup
+    "00-How-To-Use-This-Wiki.md",  # orientation page
+    "15-Further-Learning.md",      # link list
+    "16-Link-Index.md",            # link list
+}
+
+
+def DIAGRAM_EXEMPT(name):
+    return name in DIAGRAM_EXEMPT_PAGES or name.endswith(DIAGRAM_EXEMPT_SUFFIXES)
+
+
 errors, warnings = [], []
 
 
@@ -64,21 +80,34 @@ def manifest_pages():
     return out
 
 
+SECTION_INDEX = re.compile(r"^> \*\*Section \d+ · (?![^ ]*Lesson)[^*]*\*\* —")
+
+
 def index_pages():
-    """Generated pages (Home + section indexes) that are exempt from the lesson skeleton."""
+    """Generated pages (Home + section indexes) that are exempt from the lesson skeleton.
+
+    Detect them by content, not by filename. A section index opens with an overview
+    blockquote ('> **Section 5 · Git & CI/CD** - ...'); a lesson page carries
+    '> **Section 05 · Lesson 3** · Level: ...'. Matching on the filename instead
+    exempted every page in the wiki (every lesson file also starts 'NN-Capital'),
+    which silently disabled the skeleton, word-budget, internal-link, mermaid and
+    banned-word checks for 138 of 141 lesson pages.
+    """
     exempt = {"00-Home.md", "_Sidebar.md", "_Footer.md"}
     for f in os.listdir(WIKI) if os.path.isdir(WIKI) else []:
-        if f.endswith(".md") and re.match(r"^\d\d-[A-Z]", f) and not re.match(r"^\d\d-[a-z]", f):
-            exempt.add(f)
+        if not f.endswith(".md"):
+            continue
+        with open(os.path.join(WIKI, f), encoding="utf-8") as fh:
+            if SECTION_INDEX.match(fh.readline()):
+                exempt.add(f)
     return exempt
 
 
 def section_indexes(pages):
     """Pages that open with a section overview blockquote rather than a lesson one."""
     out = []
-    pattern = re.compile(r"^> \*\*Section \d+ · (?![^ ]*Lesson)[^*]*\*\* —")
     for f in pages:
-        if pattern.match(open(os.path.join(WIKI, f), encoding="utf-8").readline()):
+        if SECTION_INDEX.match(open(os.path.join(WIKI, f), encoding="utf-8").readline()):
             out.append(f)
     return out
 
@@ -146,8 +175,10 @@ def check_page(path, name, exempt):
             err(name, f"only {w} words of prose (house minimum is 400)")
         elif w > 1400:
             warn(name, f"{w} words of prose (house maximum is 1400 — consider splitting)")
-        # diagrams promised vs delivered
-        if "```mermaid" not in text and "png)" not in text:
+        # diagrams promised vs delivered. Exercise pages and lookup/reference
+        # pages are exempt: they point at the lessons that carry the mental
+        # model, and a diagram there is filler. Everything else must show one.
+        if "```mermaid" not in text and "png)" not in text and not DIAGRAM_EXEMPT(name):
             warn(name, "no diagram and no infographic")
 
     # 5. internal links resolve
