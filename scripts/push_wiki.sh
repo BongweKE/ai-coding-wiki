@@ -29,13 +29,18 @@ command -v git >/dev/null || die "git is required"
 [ -d "$SRC" ] || die "no wiki/ directory in $REPO_ROOT"
 
 # Prefer SSH if the user's gh auth uses it; fall back to the gh credential helper.
+# WIKI_REMOTE overrides the URL entirely, which is how this script is tested against a local
+# bare repository in CI or by hand:
+#   WIKI_REMOTE=/tmp/fake-wiki.git scripts/push_wiki.sh
+REMOTE="${WIKI_REMOTE:-https://github.com/$OWNER_REPO.wiki.git}"
 if git -c credential.helper='!gh auth git-credential' clone --depth 1 \
-      "https://github.com/$OWNER_REPO.wiki.git" "$WORK/wiki" 2>/dev/null; then
+      "$REMOTE" "$WORK/wiki" 2>/dev/null; then
   :
 else
-  die "could not clone https://github.com/$OWNER_REPO.wiki.git
+  die "could not clone $REMOTE
 GitHub only creates the wiki repository after the first page exists.
-Open https://github.com/$OWNER_REPO/wiki, click 'Create the first page', save it, then re-run this script."
+Open https://github.com/$OWNER_REPO/wiki, click 'Create the first page', save it, then re-run this script.
+(To test this script against a local repository, set WIKI_REMOTE=/path/to/bare.git)"
 fi
 
 cd "$WORK/wiki"
