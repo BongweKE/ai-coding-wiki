@@ -15,4 +15,11 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 bash scripts/build_site.sh
-npx --yes wrangler@4 deploy
+
+# Prefer the installed binary; fall back to a pinned npx copy so the script
+# works on a machine that has never run wrangler.
+if command -v wrangler >/dev/null 2>&1; then
+  wrangler deploy
+else
+  npx --yes wrangler@4 deploy
+fi
