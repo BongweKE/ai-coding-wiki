@@ -12,9 +12,16 @@
   // route must exist for this hostname to reach this Worker.
   "name": "ai-coding-wiki",
   "compatibility_date": "2026-09-01",
+  "main": "cloudflare/worker.js",
   "assets": {
     "directory": "./site",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // The site is built with use_directory_urls: false, so every page is a
+    // real .html file and the canonical URLs (sitemap, meta) end in .html.
+    // The default 'auto-trailing-slash' would 307 every link to the
+    // extensionless form, adding a hop and disagreeing with the canonical.
+    "html_handling": "none"
   },
   "routes": [
     { "pattern": "vibe.bongwe.space", "custom_domain": true },

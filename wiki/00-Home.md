@@ -6,6 +6,8 @@ A **free, technical, bite-sized wiki** for people who are new to software engine
 
 AI wrote a lot of the words here; the lessons came from real projects. Everything is grounded in shipped work, official documentation and public security research. Where a page states a number that changes often, it says so.
 
+**Two ways to read this.** With full-text search, dark mode and a per-page table of contents: **[vibe.bongwe.space](https://vibe.bongwe.space)**. On GitHub, for anyone who lands on the wiki tab: this page. Both are built from the same lessons, published from the same source.
+
 ## Who this is for
 
 | If you are... | Start here |
