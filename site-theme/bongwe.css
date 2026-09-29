@@ -1,0 +1,391 @@
+/* ==========================================================================
+   The Bongwe theme — vibe.bongwe.space wearing bongwe.space's clothes.
+
+   Design tokens are lifted from https://bongwe.space (its stylesheet is the
+   source of truth, kept in sync by hand): warm paper, warm ink, terracotta,
+   and the hand-drawn wobble that makes cards there look pinned to a wall.
+   The wiki extends that idea: admonitions are the pinned notes of a
+   knowledge wall, so they get the wobbly border and the offset shadow.
+
+   Load order: MkDocs loads extra_css after the theme, so same-specificity
+   rules here win over Material's own scheme rules.
+   ========================================================================== */
+
+:root {
+  --bw-paper: #fcf9f3;
+  --bw-surface: #f4efe6;
+  --bw-ink: #1c1c18;
+  --bw-night: #181a1b;
+  --bw-terracotta: #bd462d;
+  --bw-ember: #e06349;
+  --bw-clay: #85220f;
+  --bw-taupe: #8c716b;
+  --bw-cocoa: #6e5751;
+  --bw-highlight: #fff6a9;
+  --bw-indigo: #2e4a7b;
+  --bw-gold: #d99e30;
+  --bw-goldlight: #f0ba54;
+  --bw-leaf: #2d8b57;
+  --bw-pine: #1f6b42;
+
+  /* Hand-drawn radii, from bongwe.space's cards and notes. */
+  --bw-wobble: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --bw-wobble-sm: 120px 8px 110px 8px / 8px 110px 8px 120px;
+  --bw-shadow: 4px 4px rgba(28, 28, 24, 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   Color schemes. primary/accent are `custom` in mkdocs.yml, so every color
+   the theme needs is defined here — light is the paper wall, dark is the
+   ink wall (bongwe.space is light-only; the dark side stays warm rather
+   than going slate-grey).
+   -------------------------------------------------------------------------- */
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: var(--bw-paper);
+  --md-default-fg-color: var(--bw-ink);
+  --md-default-fg-color--light: var(--bw-cocoa);
+  --md-default-fg-color--lighter: var(--bw-taupe);
+
+  --md-primary-fg-color: var(--bw-terracotta);
+  --md-primary-fg-color--light: var(--bw-ember);
+  --md-primary-fg-color--dark: var(--bw-clay);
+  --md-primary-bg-color: var(--bw-paper);
+  --md-accent-fg-color: var(--bw-clay);
+
+  --md-code-bg-color: var(--bw-surface);
+  --md-code-fg-color: var(--bw-ink);
+  --md-typeset-a-color: var(--bw-terracotta);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: var(--bw-night);
+  --md-default-fg-color: var(--bw-paper);
+  --md-default-fg-color--light: #c9c2b8;
+  --md-default-fg-color--lighter: var(--bw-taupe);
+
+  --md-primary-fg-color: var(--bw-ember);
+  --md-primary-fg-color--light: #f2a08e;
+  --md-primary-fg-color--dark: var(--bw-terracotta);
+  --md-primary-bg-color: var(--bw-night);
+  --md-accent-fg-color: var(--bw-goldlight);
+
+  --md-code-bg-color: #232220;
+  --md-code-fg-color: #e8e2d6;
+  --md-typeset-a-color: var(--bw-ember);
+}
+
+/* --------------------------------------------------------------------------
+   Type. Body and code come through mkdocs.yml `theme.font` (Hanken Grotesk
+   and Space Mono, loaded by Material); Bricolage Grotesque — bongwe.space's
+   display face — is loaded in overrides/main.html.
+   -------------------------------------------------------------------------- */
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5 {
+  font-family: "Bricolage Grotesque", var(--md-text-font), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--md-default-fg-color);
+}
+
+/* The highlighter pen bongwe.space selects with. */
+::selection {
+  background: var(--bw-highlight);
+  color: var(--bw-ink);
+}
+
+/* --------------------------------------------------------------------------
+   The frame: header, tabs and footer read as the ink-lined edge of the
+   wall, not Material's colored bands.
+   -------------------------------------------------------------------------- */
+
+.md-header {
+  background: var(--md-default-bg-color);
+  box-shadow: none;
+  border-bottom: 2px solid var(--bw-ink);
+}
+
+.md-header,
+.md-header .md-header__option,
+.md-header .md-tabs,
+.md-header .md-tabs a,
+.md-header .md-search__icon,
+.md-header .md-header__topic {
+  color: var(--bw-ink);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  border-bottom-color: #3d3a33;
+}
+
+[data-md-color-scheme="slate"] .md-header,
+[data-md-color-scheme="slate"] .md-header .md-header__option,
+[data-md-color-scheme="slate"] .md-header .md-tabs a,
+[data-md-color-scheme="slate"] .md-header .md-header__topic {
+  color: var(--bw-paper);
+}
+
+.md-header .md-tabs a:hover,
+.md-header .md-header__topic a:hover,
+.md-header .md-search__icon:hover {
+  color: var(--md-primary-fg-color);
+}
+
+/* Section tabs under the header (desktop): quiet paper, terracotta when
+   you are standing in the aisle. */
+.md-tabs {
+  background: var(--md-default-bg-color);
+  border-bottom: 2px solid var(--bw-ink);
+  color: var(--bw-ink);
+}
+
+[data-md-color-scheme="slate"] .md-tabs {
+  border-bottom-color: #3d3a33;
+  color: var(--bw-paper);
+}
+
+.md-tabs .md-tabs__link--active,
+.md-tabs .md-tabs__link:hover {
+  color: var(--md-primary-fg-color);
+}
+
+.md-footer {
+  background: var(--md-default-bg-color);
+  border-top: 2px solid var(--bw-ink);
+  color: var(--bw-cocoa);
+}
+
+[data-md-color-scheme="slate"] .md-footer {
+  border-top-color: #3d3a33;
+  color: var(--bw-taupe);
+}
+
+.md-footer a {
+  color: var(--md-primary-fg-color);
+}
+
+/* --------------------------------------------------------------------------
+   Code. Space Mono is wider than the default mono, so code blocks run a
+   touch smaller to keep lines from wrapping; inline code gets the soft
+   surface tone and a small square corner, like bongwe.space's chips.
+   -------------------------------------------------------------------------- */
+
+.md-typeset pre > code {
+  font-size: 0.82em;
+}
+
+.md-typeset :not(pre) > code {
+  border: 1px solid rgba(28, 28, 24, 0.12);
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+[data-md-color-scheme="slate"] .md-typeset :not(pre) > code {
+  border-color: rgba(252, 249, 243, 0.16);
+}
+
+kbd {
+  font-family: var(--md-code-font);
+  background: var(--md-default-bg-color);
+  border: 1.5px solid var(--bw-taupe);
+  border-radius: 4px;
+  box-shadow: var(--bw-shadow);
+  color: var(--md-default-fg-color);
+}
+
+/* --------------------------------------------------------------------------
+   Pinned notes: admonitions and collapsible details get the hand-drawn
+   wobble and the offset shadow, the way cards on bongwe.space are pinned
+   to its wall. The border carries the type's meaning; the note itself
+   stays paper so the page keeps reading calm.
+   -------------------------------------------------------------------------- */
+
+.md-typeset .admonition,
+.md-typeset details {
+  border: 2px solid var(--bw-taupe);
+  border-radius: var(--bw-wobble-sm);
+  background: var(--bw-paper);
+  box-shadow: var(--bw-shadow);
+  overflow: hidden;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition,
+[data-md-color-scheme="slate"] .md-typeset details {
+  background: #1e1d19;
+  border-color: #3d3a33;
+  box-shadow: 4px 4px rgba(0, 0, 0, 0.4);
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-weight: 700;
+}
+
+/* Type colors, mapped to bongwe.space's palette. */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: var(--bw-indigo);
+  --md-admonition-fg-color: var(--bw-indigo);
+}
+
+.md-typeset .admonition.abstract,
+.md-typeset .admonition.info,
+.md-typeset .admonition.question,
+.md-typeset .admonition.todo,
+.md-typeset details.abstract,
+.md-typeset details.info,
+.md-typeset details.question,
+.md-typeset details.todo {
+  border-color: var(--bw-indigo);
+  --md-admonition-fg-color: var(--bw-indigo);
+}
+
+.md-typeset .admonition.tip,
+.md-typeset .admonition.hint,
+.md-typeset .admonition.important,
+.md-typeset .admonition.success,
+.md-typeset details.tip,
+.md-typeset details.hint,
+.md-typeset details.important,
+.md-typeset details.success {
+  border-color: var(--bw-leaf);
+  --md-admonition-fg-color: var(--bw-pine);
+}
+
+.md-typeset .admonition.warning,
+.md-typeset .admonition.caution,
+.md-typeset .admonition.attention,
+.md-typeset details.warning,
+.md-typeset details.caution,
+.md-typeset details.attention {
+  border-color: var(--bw-gold);
+  --md-admonition-fg-color: #8a5e0b;
+}
+
+.md-typeset .admonition.danger,
+.md-typeset .admonition.error,
+.md-typeset .admonition.failure,
+.md-typeset .admonition.bug,
+.md-typeset details.danger,
+.md-typeset details.error,
+.md-typeset details.failure,
+.md-typeset details.bug {
+  border-color: var(--bw-terracotta);
+  --md-admonition-fg-color: var(--bw-terracotta);
+}
+
+.md-typeset .admonition.example,
+.md-typeset .admonition.quote,
+.md-typeset details.example,
+.md-typeset details.quote {
+  border-color: var(--bw-taupe);
+  --md-admonition-fg-color: var(--bw-cocoa);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition.warning,
+[data-md-color-scheme="slate"] .md-typeset details.warning,
+[data-md-color-scheme="slate"] .md-typeset .admonition.caution,
+[data-md-color-scheme="slate"] .md-typeset details.caution,
+[data-md-color-scheme="slate"] .md-typeset .admonition.attention,
+[data-md-color-scheme="slate"] .md-typeset details.attention {
+  --md-admonition-fg-color: var(--bw-goldlight);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition.note,
+[data-md-color-scheme="slate"] .md-typeset details.note,
+[data-md-color-scheme="slate"] .md-typeset .admonition.abstract,
+[data-md-color-scheme="slate"] .md-typeset details.abstract,
+[data-md-color-scheme="slate"] .md-typeset .admonition.info,
+[data-md-color-scheme="slate"] .md-typeset details.info,
+[data-md-color-scheme="slate"] .md-typeset .admonition.question,
+[data-md-color-scheme="slate"] .md-typeset details.question,
+[data-md-color-scheme="slate"] .md-typeset .admonition.todo,
+[data-md-color-scheme="slate"] .md-typeset details.todo {
+  --md-admonition-fg-color: #7c9bd4;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition.tip,
+[data-md-color-scheme="slate"] .md-typeset details.tip,
+[data-md-color-scheme="slate"] .md-typeset .admonition.hint,
+[data-md-color-scheme="slate"] .md-typeset details.hint,
+[data-md-color-scheme="slate"] .md-typeset .admonition.important,
+[data-md-color-scheme="slate"] .md-typeset details.important,
+[data-md-color-scheme="slate"] .md-typeset .admonition.success,
+[data-md-color-scheme="slate"] .md-typeset details.success {
+  --md-admonition-fg-color: #7ce0ac;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition.danger,
+[data-md-color-scheme="slate"] .md-typeset details.danger,
+[data-md-color-scheme="slate"] .md-typeset .admonition.error,
+[data-md-color-scheme="slate"] .md-typeset details.error,
+[data-md-color-scheme="slate"] .md-typeset .admonition.failure,
+[data-md-color-scheme="slate"] .md-typeset details.failure,
+[data-md-color-scheme="slate"] .md-typeset .admonition.bug,
+[data-md-color-scheme="slate"] .md-typeset details.bug {
+  --md-admonition-fg-color: var(--bw-ember);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .admonition.example,
+[data-md-color-scheme="slate"] .md-typeset details.example,
+[data-md-color-scheme="slate"] .md-typeset .admonition.quote,
+[data-md-color-scheme="slate"] .md-typeset details.quote {
+  --md-admonition-fg-color: var(--bw-taupe);
+}
+
+/* --------------------------------------------------------------------------
+   The quiet parts: quotes, tables, marks and links stay disciplined so the
+   wobble above stays the memorable thing.
+   -------------------------------------------------------------------------- */
+
+.md-typeset blockquote {
+  border-left: 2px dashed var(--bw-taupe);
+  color: var(--bw-cocoa);
+}
+
+.md-typeset table:not([class]) th {
+  border-bottom: 2px solid var(--bw-ink);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) th {
+  border-bottom-color: #4a4740;
+}
+
+.md-typeset table:not([class]) td {
+  border-top: 1px solid rgba(140, 113, 107, 0.35);
+}
+
+[data-md-color-scheme="slate"] .md-typeset table:not([class]) td {
+  border-top-color: rgba(140, 113, 107, 0.4);
+}
+
+.md-typeset mark {
+  background: var(--bw-highlight);
+  color: var(--bw-ink);
+  box-shadow: none;
+}
+
+[data-md-color-scheme="slate"] .md-typeset mark {
+  color: var(--bw-ink);
+}
+
+.md-typeset a:hover {
+  color: var(--md-accent-fg-color);
+}
+
+/* Keyboard focus draws a solid ink ring, visible on paper and ink alike. */
+.md-typeset a:focus-visible,
+.md-nav__link:focus-visible,
+.md-search__input:focus-visible {
+  outline: 2px solid var(--bw-ink);
+  outline-offset: 2px;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:focus-visible,
+[data-md-color-scheme="slate"] .md-nav__link:focus-visible {
+  outline-color: var(--bw-paper);
+}

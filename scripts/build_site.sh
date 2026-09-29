@@ -32,6 +32,11 @@ mkdir -p site-src/assets
 cp assets/*.png site-src/assets/
 rm -f site-src/assets/og-card.png
 
+# The Bongwe theme (bongwe.space's design language). mkdocs.yml references
+# it via extra_css; it lives in site-theme/ because site-src/ is generated.
+mkdir -p site-src/assets/stylesheets
+cp site-theme/bongwe.css site-src/assets/stylesheets/bongwe.css
+
 # robots.txt: without one, Cloudflare synthesizes a content-signals stub
 # that has no Sitemap line — and that line is the one thing crawlers
 # actually read here. Cloudflare still appends its signals block on the

@@ -80,16 +80,30 @@ theme:
     - content.code.copy
     - toc.follow
   palette:
+    # Colors live in site-theme/bongwe.css (copied to assets/stylesheets/ by
+    # scripts/build_site.sh): bongwe.space's paper/ink/terracotta identity,
+    # with a warm dark variant of it for the slate scheme. `custom` means
+    # Material emits no defaults and the stylesheet defines everything.
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  font:
+    # bongwe.space's type system: Hanken Grotesk body, Space Mono for code.
+    # Bricolage Grotesque (headings) is loaded in overrides/main.html, since
+    # Material loads only a text and a code family.
+    text: Hanken Grotesk
+    code: Space Mono
   icon:
     repo: fontawesome/brands/github
 
@@ -111,6 +125,12 @@ markdown_extensions:
 # Generated from wiki/_Sidebar.md — the same order as the wiki navigation.
 # Site-level extras: the social preview image (overrides/main.html reads it),
 # the repo link in the footer, and the privacy-friendly analytics switch.
+# The Bongwe theme: bongwe.space's design language, as a stylesheet staged
+# into the build by scripts/build_site.sh (the docs dir is generated, so
+# permanent files live outside it).
+extra_css:
+  - assets/stylesheets/bongwe.css
+
 extra:
   social_image: https://vibe.bongwe.space/og-card.png
   social:
