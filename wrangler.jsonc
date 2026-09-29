@@ -20,7 +20,13 @@
     // natively, so no html_handling override is needed: "/" resolves to
     // index.html, /Foo/ resolves to Foo/index.html, and only a bare /Foo
     // 307s to /Foo/ (the site never links that form).
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    // By default the assets layer serves a matching asset directly and the
+    // Worker script never runs — so the headers in cloudflare/worker.js
+    // (and its cached-404 no-store guard) only ever reached misses. Run the
+    // Worker first on every request; it forwards to ASSETS.fetch and adds
+    // the headers to every response.
+    "run_worker_first": true
   },
   "routes": [
     { "pattern": "vibe.bongwe.space", "custom_domain": true },

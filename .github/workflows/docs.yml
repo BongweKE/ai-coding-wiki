@@ -21,6 +21,7 @@ on:
       - 'overrides/**'
       - 'assets/**'
       - 'cloudflare/**'
+      - 'wrangler.jsonc'
       - '.github/workflows/docs.yml'
   pull_request:
     paths:
@@ -30,6 +31,7 @@ on:
       - 'overrides/**'
       - 'assets/**'
       - 'cloudflare/**'
+      - 'wrangler.jsonc'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
