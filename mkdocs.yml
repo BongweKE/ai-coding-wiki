@@ -27,9 +27,17 @@ edit_uri: edit/main/wiki/
 docs_dir: site-src
 site_dir: site
 
-# Flat URLs (page.html, not page/) keep the wiki-style relative links
-# resolvable; scripts/site_hook.py maps them to the built pages.
-use_directory_urls: false
+# Directory URLs (/Foo/) are the MkDocs default and the shape a static host
+# serves natively: "/" resolves to index.html with no custom code, and the
+# canonical URL MkDocs emits is the URL actually served (no redirect hop).
+# scripts/site_hook.py hands MkDocs a source filename and MkDocs generates the
+# URL, so the wiki-style links in wiki/ do not care which shape is used.
+#
+# This replaced `use_directory_urls: false` after the root path served a 404 on
+# some edges: with flat URLs the root only worked because cloudflare/worker.js
+# remapped "/" to "/index.html", and when that remap did not run, the homepage
+# 404'd. The homepage should not depend on custom code.
+use_directory_urls: true
 
 # Prepared copies and wiki chrome, not source pages:
 #   index.md is wiki/00-Home.md under its site name; _Sidebar.md and

@@ -1,34 +1,28 @@
 /**
  * vibe.bongwe.space front door.
  *
- * The site is built with `use_directory_urls: false`, so every page is a real
- * /Foo.html file and those are the canonical URLs (sitemap, canonical tags).
- * `html_handling: "none"` in wrangler.jsonc serves those paths exactly, with no
- * redirect to an extensionless form — which also means "/" no longer falls back
- * to index.html. That single mapping is all this script does.
+ * Almost everything is handled by the static assets layer, configured in
+ * wrangler.jsonc: directory URLs (/Foo/ -> Foo/index.html), "/" -> index.html
+ * and 404.html for a miss. This script exists for one reason: a cached miss.
  *
- * It also makes the 404 explicit: MkDocs writes 404.html, and returning it for
- * a miss is friendlier than an empty body. (not_found_handling: "404-page"
- * does the same thing; doing it here keeps the behaviour visible.)
+ * A 404 that gets cached anywhere is sticky and invisible — the path may exist
+ * a minute later and the cached miss keeps being served. That is not
+ * hypothetical: the root path served a cached 404 on some edges after a deploy
+ * that briefly had no root handling. Misses are therefore re-sent with
+ * `no-store`, so only real pages are ever cached.
+ *
+ * Deliberately no path rewriting here: the homepage must not depend on this
+ * script running. If the script were stale or absent, "/" and every /Foo/
+ * still resolve at the asset layer.
  */
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    if (url.pathname === "/") {
-      url.pathname = "/index.html";
-    }
-
-    const response = await env.ASSETS.fetch(new Request(url.toString(), request));
+    const response = await env.ASSETS.fetch(request);
     if (response.status !== 404) {
       return response;
     }
-
-    const notFound = await env.ASSETS.fetch(
-      new Request(new URL("/404.html", url.origin).toString(), request),
-    );
-    if (notFound.status !== 200) {
-      return response;
-    }
-    return new Response(notFound.body, { status: 404, headers: notFound.headers });
+    const headers = new Headers(response.headers);
+    headers.set("cache-control", "no-store");
+    return new Response(response.body, { status: 404, headers });
   },
 };

@@ -16,12 +16,11 @@
   "assets": {
     "directory": "./site",
     "binding": "ASSETS",
-    "not_found_handling": "404-page",
-    // The site is built with use_directory_urls: false, so every page is a
-    // real .html file and the canonical URLs (sitemap, meta) end in .html.
-    // The default 'auto-trailing-slash' would 307 every link to the
-    // extensionless form, adding a hop and disagreeing with the canonical.
-    "html_handling": "none"
+    // MkDocs now emits directory URLs (/Foo/), the shape assets serve
+    // natively, so no html_handling override is needed: "/" resolves to
+    // index.html, /Foo/ resolves to Foo/index.html, and only a bare /Foo
+    // 307s to /Foo/ (the site never links that form).
+    "not_found_handling": "404-page"
   },
   "routes": [
     { "pattern": "vibe.bongwe.space", "custom_domain": true },
