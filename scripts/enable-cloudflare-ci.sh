@@ -31,6 +31,54 @@ say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 ok()  { printf '  \033[32mok\033[0m   %s\n' "$*"; }
 bad() { printf '  \033[31mFAIL\033[0m %s\n' "$*"; }
 
+# Strip CR and every kind of whitespace from a captured secret.
+# WHY: bash's `read -s` keeps a trailing CR as data, so a paste from a GUI
+# clipboard (CRLF) or a stray keypress can yield a value that is non-empty to
+# the shell but whitespace-only in reality. `gh secret set` accepts an empty
+# value from a pipe with exit status 0, so that lands as a secret that exists
+# and is empty — and the CI guard then treats the token as unset.
+normalise() { printf '%s' "$1" | tr -d '[:space:]'; }
+
+# Cloudflare API tokens are long (40 chars today, and they are not always that
+# shape). Refuse anything implausibly short rather than storing garbage.
+MIN_TOKEN_CHARS=20
+
+read_token() {
+  local raw attempt=0
+  TOKEN="$(normalise "${CLOUDFLARE_API_TOKEN:-}")"
+  [ -n "$TOKEN" ] && { ok "using CLOUDFLARE_API_TOKEN from the environment (${#TOKEN} chars)"; return 0; }
+
+  say "Create an API token (30 seconds)"
+  cat <<'INSTRUCTIONS'
+Cloudflare dashboard -> My Profile -> API Tokens -> Create Token
+  Permissions:       Account / Workers Scripts / Edit
+                     Account / Workers Routes  / Edit
+  Account resources: include your account
+Copy the token, then paste it below. Input is hidden while you type.
+INSTRUCTIONS
+
+  [ -t 0 ] || { bad "no token given and stdin is not a terminal — export CLOUDFLARE_API_TOKEN instead"; exit 1; }
+
+  while [ "$attempt" -lt 3 ]; do
+    attempt=$((attempt + 1))
+    printf '\nPaste the token (attempt %s/3, input hidden): ' "$attempt"
+    read -rs raw; echo
+    TOKEN="$(normalise "$raw")"
+    unset raw
+    if [ -z "$TOKEN" ]; then
+      bad "nothing usable read — paste the token itself, not a blank line"
+    elif [ "${#TOKEN}" -lt "$MIN_TOKEN_CHARS" ]; then
+      bad "only ${#TOKEN} characters read; a Cloudflare token is much longer — copy it again from the dashboard"
+      TOKEN=""
+    else
+      ok "read ${#TOKEN} characters"
+      return 0
+    fi
+  done
+  bad "no usable token after 3 attempts"
+  exit 1
+}
+
 need_gh() {
   command -v gh >/dev/null || { bad "gh is not installed"; exit 1; }
   gh auth status >/dev/null 2>&1 || { bad "not logged in — run: gh auth login"; exit 1; }
@@ -69,6 +117,13 @@ run_and_report() {
     *)       bad "Publish to Cloudflare step: $step" ;;
   esac
 
+  # Lengths the runner saw (never the values): a secret that exists but reads
+  # as zero characters is an empty value — gh accepts an empty paste with exit
+  # status 0, so this is the only place that is visible.
+  local lengths
+  lengths="$(gh run view "$id" --log 2>/dev/null | grep -o "secret lengths:.*" | tail -1 || true)"
+  [ -n "$lengths" ] && echo "  runner saw: $lengths"
+
   # Are both copies the same build? Compare a fingerprint of each (the Home
   # page links to the domain, so it is a cheap content check).
   say "Published copies"
@@ -93,30 +148,17 @@ case "${1:-enable}" in
   enable)
     need_gh
 
-    TOKEN="${CLOUDFLARE_API_TOKEN:-}"
-    if [ -z "$TOKEN" ]; then
-      say "Create an API token (30 seconds)"
-      cat <<'INSTRUCTIONS'
-Cloudflare dashboard -> My Profile -> API Tokens -> Create Token
-  Permissions:       Account / Workers Scripts / Edit
-                     Account / Workers Routes  / Edit
-  Account resources: include your account
-Copy the token, then paste it below. Input is hidden while you type.
-INSTRUCTIONS
-      if [ -t 0 ]; then
-        printf '\nPaste the token: '
-        read -rs TOKEN; echo
-      else
-        bad "no token given and stdin is not a terminal — export CLOUDFLARE_API_TOKEN instead"
-        exit 1
-      fi
-    fi
-    [ -n "$TOKEN" ] || { bad "empty token"; exit 1; }
+    read_token
 
     say "Storing secrets in $REPO"
+    TOKEN_LEN="${#TOKEN}"
     printf '%s' "$TOKEN" | gh secret set CLOUDFLARE_API_TOKEN
     unset TOKEN
     gh secret set CLOUDFLARE_ACCOUNT_ID --body "$ACCOUNT_ID"
+    ok "CLOUDFLARE_API_TOKEN: ${TOKEN_LEN} characters stored"
+    ok "CLOUDFLARE_ACCOUNT_ID: ${#ACCOUNT_ID} characters stored"
+    echo "  gh stores whatever it is handed; only the run below proves it is right."
+    unset TOKEN_LEN
     gh secret list | grep -E 'CLOUDFLARE' | sed 's/^/  /'
 
     run_and_report

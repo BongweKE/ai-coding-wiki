@@ -95,14 +95,12 @@ jobs:
         env:
           TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PROBE: ${{ secrets.HERMES_PROBE }}
         run: |
-          # Lengths only, never values: they distinguish "secret not set" from
-          # "secret set to an empty string", which are identical to the shell.
-          # PROBE is a control set with the same `printf | gh secret set` form
-          # the setup script uses, so a zero token beside a non-zero probe
-          # means the stored token is empty, not that the plumbing is broken.
-          echo "secret lengths: token=${#TOKEN} account=${#ACCOUNT_ID} probe=${#PROBE}"
+          # Lengths only, never values. A secret that EXISTS can still hold an
+          # empty string: `gh secret set` stores an empty or whitespace-only
+          # paste with exit status 0, and the shell cannot tell that apart from
+          # "unset". This line can, so keep it — it is the only visible symptom.
+          echo "secret lengths: token=${#TOKEN} account=${#ACCOUNT_ID}"
           if [ -n "$TOKEN" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
