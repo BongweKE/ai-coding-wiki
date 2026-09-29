@@ -94,7 +94,15 @@ jobs:
         id: cf
         env:
           TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROBE: ${{ secrets.HERMES_PROBE }}
         run: |
+          # Lengths only, never values: they distinguish "secret not set" from
+          # "secret set to an empty string", which are identical to the shell.
+          # PROBE is a control set with the same `printf | gh secret set` form
+          # the setup script uses, so a zero token beside a non-zero probe
+          # means the stored token is empty, not that the plumbing is broken.
+          echo "secret lengths: token=${#TOKEN} account=${#ACCOUNT_ID} probe=${#PROBE}"
           if [ -n "$TOKEN" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
