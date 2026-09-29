@@ -46,6 +46,10 @@ fi
 cd "$WORK/wiki"
 git config user.name  "$(git -C "$REPO_ROOT" config user.name)"
 git config user.email "$(git -C "$REPO_ROOT" config user.email)"
+# The clone used `-c credential.helper=...`, which applies only to that one command. Persist it
+# in the clone's config so the push below is authenticated too (GitHub's wiki repo is not SSH-routed
+# by gh by default, and an unauthenticated push fails with "could not read Username").
+git config credential.helper '!gh auth git-credential'
 
 # 1. copy every page from wiki/ (flat namespace: GitHub wiki has no directories)
 shopt -s nullglob
