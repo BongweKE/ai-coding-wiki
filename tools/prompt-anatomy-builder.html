@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompt Anatomy Builder — Coding With AI in the New Age</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#30363d; --ink:#e6edf3; --dim:#8b949e;
+    --teal:#2dd4bf; --blue:#58a6ff; --amber:#d29922; --red:#f85149; --purple:#bc8cff; --green:#3fb950;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:28px 24px 18px;border-bottom:1px solid var(--line)}
+  h1{margin:0 0 6px;font-size:24px}
+  .sub{color:var(--dim);font-size:14px;max-width:820px}
+  main{display:grid;grid-template-columns:minmax(320px,1fr) minmax(360px,1fr);gap:0;height:calc(100vh - 118px)}
+  @media (max-width:900px){main{grid-template-columns:1fr;height:auto}}
+  .col{padding:20px 24px;overflow:auto}
+  .col:first-child{border-right:1px solid var(--line)}
+  label{display:block;margin:14px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim)}
+  .hint{font-size:12px;color:#6e7681;margin-top:3px}
+  input,textarea,select{width:100%;background:#0d1117;color:var(--ink);border:1px solid var(--line);
+    border-radius:8px;padding:9px 10px;font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
+  textarea{resize:vertical;min-height:64px}
+  .badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim);margin-left:6px}
+  button{background:var(--teal);color:#0d1117;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+  pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;white-space:pre-wrap;
+    font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:0}
+  .score{margin:14px 0 0;font-size:14px;color:var(--dim)}
+  .score b{color:var(--ink)}
+  .meter{height:8px;background:var(--panel);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:6px}
+  .meter i{display:block;height:100%;background:var(--teal);width:0%}
+  .tip{border-left:3px solid var(--amber);padding:8px 12px;background:#161b22;border-radius:6px;font-size:13px;color:#c9d1d9;margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Prompt Anatomy Builder</h1>
+  <div class="sub">Fill the six parts and watch the prompt assemble. Beginners write part 3 and wonder why the answer is wrong.
+  The <em>verification</em> line is the one that saves you — it forces the agent to show evidence instead of assurance.</div>
+</header>
+<main>
+  <section class="col" aria-label="inputs">
+    <label>1 · Context <span class="badge">belongs in AGENTS.md long-term</span></label>
+    <textarea id="ctx" placeholder="FastAPI service, Postgres via SQLAlchemy, tests in pytest, one route file per resource."></textarea>
+
+    <label>2 · Task — one outcome, one sentence</label>
+    <textarea id="task" placeholder="Add GET /invoices/{id} that returns one invoice for the caller's organisation."></textarea>
+
+    <label>3 · Constraints — what must not change</label>
+    <textarea id="cons" placeholder="Do not touch auth or the money helpers. No new dependencies. Keep the existing error shape."></textarea>
+
+    <label>4 · Inputs — delimited data, never bare commands</label>
+    <textarea id="inp" placeholder="&lt;schema&gt;...&lt;/schema&gt;&#10;&lt;issue&gt;...&lt;/issue&gt;"></textarea>
+
+    <label>5 · Output format</label>
+    <textarea id="out" placeholder="A minimal diff plus the exact command you ran."></textarea>
+
+    <label>6 · Verification — how to prove it worked</label>
+    <textarea id="ver" placeholder="Run pytest tests/test_invoices.py -q and paste the output. Show the diff stat."></textarea>
+
+    <div class="row">
+      <button id="copy">Copy prompt</button>
+      <button id="clear" class="ghost">Clear</button>
+      <select id="example" style="max-width:220px">
+        <option value="">Load an example…</option>
+        <option value="fix">Bug fix</option>
+        <option value="test">Write a failing test</option>
+        <option value="review">Review a diff</option>
+      </select>
+    </div>
+    <div class="score">Completeness: <b id="pct">0%</b>
+      <div class="meter"><i id="bar"></i></div>
+    </div>
+    <div class="tip" id="tip">Every field you leave empty is an assumption the model will make for you.</div>
+  </section>
+
+  <section class="col" aria-label="output">
+    <label>Assembled prompt</label>
+    <pre id="out-pre">Nothing yet — start typing on the left.</pre>
+    <div class="tip">Run it, then iterate on the instruction — not on the volume. If the answer is wrong twice for the same reason, the missing line belongs in your rules file, a skill, or a CI gate.</div>
+  </section>
+</main>
+<script>
+(function(){
+  var ids = ['ctx','task','cons','inp','out','ver'];
+  var el = {}, i;
+  for (i=0;i<ids.length;i++) el[ids[i]] = document.getElementById(ids[i]);
+  var pre = document.getElementById('out-pre'), pct = document.getElementById('pct'), bar = document.getElementById('bar'),
+      tip = document.getElementById('tip');
+
+  var TIPS = {
+    ctx: 'Context: where we are. Long-lived parts belong in AGENTS.md, not in every prompt.',
+    task: 'Task: one outcome. Two outcomes in one prompt produce one done and one half-done.',
+    cons: 'Constraints: what must not change. This is what stops drive-by refactors.',
+    inp: 'Inputs: wrap data in tags so the model cannot confuse data with orders.',
+    out: 'Output format: "minimal diff + the command you ran" is usually the right answer shape.',
+    ver: 'Verification: ask for evidence — a test command and its output. "Are you sure?" is not verification.'
+  };
+
+  function assemble(){
+    var parts = [];
+    function add(label, v, tag){
+      v = v.trim(); if(!v) return;
+      parts.push(tag ? '<'+tag+'>\n'+v+'\n</'+tag+'>' : '## '+label+'\n'+v);
+    }
+    add('CONTEXT', el.ctx.value);
+    add('TASK', el.task.value);
+    add('CONSTRAINTS', el.cons.value);
+    add('INPUT', el.inp.value, 'input');
+    add('OUTPUT FORMAT', el.out.value);
+    add('VERIFY', el.ver.value);
+    return parts.join('\n\n');
+  }
+
+  function render(){
+    var text = assemble();
+    pre.textContent = text || 'Nothing yet — start typing on the left.';
+    var filled = 0, first = null;
+    for (var j=0;j<ids.length;j++){
+      if (el[ids[j]].value.trim()) filled++; else if (!first) first = ids[j];
+    }
+    var p = Math.round(filled/ids.length*100);
+    pct.textContent = p+'%';
+    bar.style.width = p+'%';
+    bar.style.background = p>=84 ? 'var(--green)' : (p>=50 ? 'var(--amber)' : 'var(--red)');
+    tip.textContent = first ? TIPS[first] : 'All six parts present. Now run it and read the diff — a complete prompt is not a correct answer.';
+  }
+
+  var EXAMPLES = {
+    fix: {ctx:'Dart/Shelf API, Postgres via Neon, tests with package:test. One router file per feature.',
+          task:'Fix: a suspended user can still refresh their session and keep using the API.',
+          cons:'Do not change the token format, do not add dependencies, keep the existing error envelope camelCase.',
+          inp:'<repro>\n1. create user, 2. suspend them in the admin fixture, 3. POST /auth/refresh with the old refresh token -> 200\n</repro>',
+          out:'A minimal diff, plus the test you added and its name.',
+          ver:'Run dart test test/auth/refresh_test.dart and show the output. Confirm the new test fails before the fix.'},
+    test: {ctx:'Python 3.12, pytest, existing invoices module with no tests for the status filter.',
+           task:'Write the failing tests for filtering invoices by status, before any implementation.',
+           cons:'Do not modify source files in this step. Tests must fail for the right reason.',
+           inp:'<signature>\nGET /invoices?status=paid|pending|cancelled\n</signature>',
+           out:'One test file plus the pytest command.',
+           ver:'Run pytest -q and paste the failures, including the assertion messages.'},
+    review:{ctx:'Small team, staging-first pipeline, review of an agent-written diff for a payments endpoint.',
+            task:'Review this diff against the issue and report only defects, not preferences.',
+            cons:'Do not suggest refactors. Do not comment on formatting. Cite file and line.',
+            inp:'<diff>\n(paste the diff here)\n</diff>',
+            out:'A list: severity, file:line, what breaks, how you know.',
+            ver:'For each defect, name the test or command that would demonstrate it.'}
+  };
+
+  document.getElementById('example').addEventListener('change', function(e){
+    var k = e.target.value; if(!k) return;
+    var d = EXAMPLES[k];
+    el.ctx.value = d.ctx; el.task.value = d.task; el.cons.value = d.cons;
+    el.inp.value = d.inp; el.out.value = d.out; el.ver.value = d.ver;
+    render();
+  });
+
+  document.getElementById('copy').addEventListener('click', function(){
+    var t = assemble();
+    if (navigator.clipboard) navigator.clipboard.writeText(t);
+    else { var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+    this.textContent = 'Copied'; var b=this; setTimeout(function(){ b.textContent='Copy prompt'; }, 1200);
+  });
+
+  document.getElementById('clear').addEventListener('click', function(){
+    for (var j=0;j<ids.length;j++) el[ids[j]].value='';
+    render();
+  });
+
+  for (i=0;i<ids.length;i++) el[ids[i]].addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI Pipeline Visualiser — Coding With AI in the New Age</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--ink:#e6edf3;--dim:#8b949e;
+        --teal:#2dd4bf;--blue:#58a6ff;--amber:#d29922;--red:#f85149;--purple:#bc8cff;--green:#3fb950}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:28px 24px 18px;border-bottom:1px solid var(--line)}
+  h1{margin:0 0 6px;font-size:24px}
+  .sub{color:var(--dim);font-size:14px;max-width:880px}
+  main{padding:20px 24px;display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:28px}
+  @media (max-width:900px){main{grid-template-columns:1fr}}
+  h3{font-size:14px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);margin:0 0 10px}
+  .gate{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);margin-bottom:8px}
+  .gate input{margin:0}
+  .gate .name{flex:1;font-size:14px}
+  .gate .t{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .gate.on{border-color:#3d444d}
+  .gate.off{opacity:.55}
+  select{width:100%;background:#0d1117;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin-bottom:14px}
+  button{background:var(--teal);color:#0d1117;border:0;border-radius:8px;padding:11px 16px;font-weight:700;cursor:pointer;width:100%}
+  button:disabled{opacity:.5;cursor:default}
+  .flow{display:flex;flex-direction:column;gap:10px}
+  .stage{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel)}
+  .stage .dot{width:11px;height:11px;border-radius:50%;background:#30363d;flex:none}
+  .stage.run{border-color:var(--blue)} .stage.run .dot{background:var(--blue);animation:pulse .8s infinite alternate}
+  .stage.pass{border-color:var(--green)} .stage.pass .dot{background:var(--green)}
+  .stage.fail{border-color:var(--red)} .stage.fail .dot{background:var(--red)}
+  .stage.skip{opacity:.4}
+  .stage .body{flex:1;font-size:14px}
+  .stage .body small{color:var(--dim);display:block;font-size:12.5px;margin-top:2px}
+  .stage .st{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;flex:none}
+  @keyframes pulse{from{opacity:.35}to{opacity:1}}
+  .verdict{margin-top:16px;padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:14px}
+  .verdict h3{margin:0 0 6px;text-transform:none;letter-spacing:0;font-size:16px;color:var(--ink)}
+  .ok{border-color:var(--green)}.warn{border-color:var(--amber)}.bad{border-color:var(--red)}
+  .legend{font-size:12.5px;color:var(--dim);margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>CI Pipeline Visualiser</h1>
+  <div class="sub">Pick a defect an agent could plausibly introduce, switch gates on and off, and watch where it is caught —
+  and, more importantly, which gates let it through to production. Cheap gates first: seconds beat minutes.</div>
+</header>
+<main>
+  <section>
+    <h3>Gates</h3>
+    <div id="gates"></div>
+    <h3 style="margin-top:18px">Inject a defect</h3>
+    <select id="defect">
+      <option value="none">Nothing wrong (a clean commit)</option>
+      <option value="format">Missing formatting / stray whitespace</option>
+      <option value="deadcode">Unused import and a dead branch</option>
+      <option value="type">Calls a field that does not exist (type mismatch)</option>
+      <option value="logic">Off-by-one in a query filter</option>
+      <option value="secret">Pasted an API key into a config file</option>
+      <option value="migration">Destructive migration: DROP COLUMN on a live table</option>
+      <option value="dep">New dependency that does not exist (hallucinated package)</option>
+      <option value="wire">Renames a JSON field: client still sends snake_case</option>
+      <option value="deploy">Code is fine; the runtime image lacks a CA trust store</option>
+      <option value="testweaken">Agent deleted the assertion that defined the requirement</option>
+    </select>
+    <button id="run">Run the pipeline</button>
+    <div class="legend">Nothing here runs real code — it is a model of where each check sits, and what a gate that is switched off
+    costs you later. Your real pipeline belongs in <code>.github/workflows/</code> and runs in CI, not in your browser.</div>
+  </section>
+  <section>
+    <h3>Pipeline</h3>
+    <div class="flow" id="flow"></div>
+    <div class="verdict" id="verdict"><h3>Ready</h3><p>Choose a defect and run the pipeline.</p></div>
+  </section>
+</main>
+<script>
+(function(){
+  var GATES = [
+    {id:'format',  name:'Format check',      t:5,   catches:['format']},
+    {id:'lint',    name:'Lint',              t:8,   catches:['deadcode']},
+    {id:'secrets', name:'Secret scan',       t:10,  catches:['secret']},
+    {id:'types',   name:'Type check',        t:45,  catches:['type']},
+    {id:'unit',    name:'Unit tests',        t:70,  catches:['logic','testweaken']},
+    {id:'migration',name:'Migration lint',   t:6,   catches:['migration']},
+    {id:'deps',    name:'Dependency review', t:12,  catches:['dep']},
+    {id:'integ',   name:'Integration tests', t:150, catches:['wire']},
+    {id:'build',   name:'Build image',       t:120, catches:[]},
+    {id:'smoke',   name:'Deploy + smoke test',t:90, catches:['deploy']}
+  ];
+  var DEFAULTS = {format:true,lint:true,secrets:true,types:true,unit:true,migration:true,deps:false,integ:false,build:true,smoke:false};
+  var enabled = Object.assign({}, DEFAULTS);
+  var gatesEl = document.getElementById('gates'), flowEl = document.getElementById('flow'),
+      verdict = document.getElementById('verdict'), defectSel = document.getElementById('defect'), runBtn = document.getElementById('run');
+
+  function gateHtml(g){
+    return '<label class="gate '+(enabled[g.id]?'on':'off')+'" data-id="'+g.id+'">'
+      + '<input type="checkbox" '+(enabled[g.id]?'checked':'')+' data-cb="'+g.id+'">'
+      + '<span class="name">'+g.name+'</span><span class="t">'+g.t+'s</span></label>';
+  }
+  function renderGates(){
+    gatesEl.innerHTML = GATES.map(gateHtml).join('');
+    var cbs = gatesEl.querySelectorAll('input[data-cb]');
+    for (var i=0;i<cbs.length;i++) cbs[i].addEventListener('change', function(e){
+      enabled[e.target.getAttribute('data-cb')] = e.target.checked; renderGates();
+    });
+  }
+  function renderFlow(state){
+    flowEl.innerHTML = GATES.map(function(g,i){
+      var st = (state && state[g.id]) || (enabled[g.id] ? 'idle' : 'skip');
+      var label = st==='pass'?'passed':st==='fail'?'FAILED':st==='run'?'running…':st==='skip'?'skipped':'queued';
+      return '<div class="stage '+st+'"><span class="dot"></span><div class="body">'+g.name
+        + '<small>catches: '+(g.catches.length? g.catches.join(', ') : 'compile/run errors only')+'</small></div>'
+        + '<span class="st">'+label+'</span></div>';
+    }).join('');
+  }
+
+  function run(){
+    var defect = defectSel.value, state = {}, i, total = 0, taken = 0;
+    runBtn.disabled = true;
+    for (i=0;i<GATES.length;i++) state[GATES[i].id] = enabled[GATES[i].id] ? 'idle' : 'skip';
+    renderFlow(state);
+    verdict.className = 'verdict'; verdict.innerHTML = '<h3>Running…</h3><p>Cheap gates first: seconds beat minutes.</p>';
+
+    var idx = 0;
+    function step(){
+      if (idx >= GATES.length){ finish(state, total); return; }
+      var g = GATES[idx];
+      if (!enabled[g.id]){ idx++; step(); return; }
+      state[g.id] = 'run'; renderFlow(state);
+      setTimeout(function(){
+        var caught = g.catches.indexOf(defect) !== -1;
+        if (caught){ state[g.id] = 'fail'; renderFlow(state); finish(state, taken, g, true); }
+        else {
+          state[g.id] = 'pass'; taken += g.t; renderFlow(state); idx++; step();
+        }
+      }, 420);
+    }
+    step();
+  }
+
+  function finish(state, secs, gate, caught){
+    runBtn.disabled = false;
+    var defect = defectSel.value, disabled = [];
+    for (var i=0;i<GATES.length;i++) if (!enabled[GATES[i].id]) disabled.push(GATES[i].name);
+    var msg, cls;
+    if (defect === 'none'){
+      cls = 'ok'; msg = '<h3>Green in '+secs+'s</h3><p>Nothing was wrong, so every enabled gate passed. '
+        + 'Note what that does <em>not</em> prove: the suite passed, and the code still might not do what the issue asked.</p>';
+    } else if (caught){
+      cls = 'ok';
+      msg = '<h3>Caught by '+gate.name+'</h3><p>The defect never reached main. Cost: one failed run and '+secs+'s of CI, instead of a rollback an hour later.</p>'
+          + '<p style="color:var(--dim);font-size:13px;margin-top:6px">If a gate keeps catching the same thing, move the rule earlier — into the rules file, a hook, or your editor.</p>';
+    } else {
+      cls = 'bad';
+      msg = '<h3>Escaped to production</h3><p>No enabled gate covers this defect. '
+          + 'This is how a green pipeline and a broken feature coexist: the checks were never about this failure.</p>'
+          + '<p style="color:var(--dim);font-size:13px;margin-top:6px">Try enabling: '
+          + (disabled.length ? disabled.slice(0,4).join(', ') : 'any of the gates — you have them all on, which means this defect needs a human diff review, not a robot')
+          + '.</p>';
+    }
+    verdict.className = 'verdict ' + cls;
+    verdict.innerHTML = msg + '<p style="color:var(--dim);font-size:13px;margin-top:8px">Elapsed before verdict: '+secs+'s. '
+      + 'Every gate you add costs time on every push, so start with format, lint, unit tests and a secret scan, then add what you have actually been burned by.</p>';
+  }
+
+  runBtn.addEventListener('click', run);
+  renderGates(); renderFlow(null);
+})();
+</script>
+</body>
+</html>

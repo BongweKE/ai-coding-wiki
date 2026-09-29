@@ -1,0 +1,43 @@
+name: wiki checks
+
+# The wiki practising what it preaches: a cheap, deterministic gate on every push and PR.
+# No network calls, no secrets, no matrix — seconds, not minutes.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wiki-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: structure, links, assets, secrets
+    runs-on: ubuntu-latest
+    steps:
+      # Tags are mutable: a compromised action tag becomes your credentials.
+      # Pinning to a full commit SHA is the hardened choice for anything holding secrets.
+      # This repo holds none, so it uses major-version tags for readability.
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check the wiki (strict)
+        run: python3 scripts/check_wiki.py --strict
+
+      - name: Rebuild infographics (fails if the generator is broken)
+        run: |
+          # Chrome is preinstalled on GitHub-hosted runners.
+          python3 scripts/build_infographics.py assets/ > /dev/null
+          git diff --stat --exit-code assets/ || \
+            echo "::warning::infographics regenerated differently — commit the rebuilt assets"

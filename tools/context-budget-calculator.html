@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Context Budget Calculator — Coding With AI in the New Age</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--ink:#e6edf3;--dim:#8b949e;
+        --teal:#2dd4bf;--blue:#58a6ff;--amber:#d29922;--red:#f85149;--purple:#bc8cff;--green:#3fb950}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:28px 24px 18px;border-bottom:1px solid var(--line)}
+  h1{margin:0 0 6px;font-size:24px}
+  .sub{color:var(--dim);font-size:14px;max-width:860px}
+  main{padding:20px 24px;display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:28px}
+  @media (max-width:900px){main{grid-template-columns:1fr}}
+  .ctrl{margin-bottom:14px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:4px}
+  .ctrl label b{color:var(--ink);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%}
+  select,input[type=number]{width:100%;background:#0d1117;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  .stack{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .seg{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+  .seg .head{display:flex;justify-content:space-between;padding:9px 12px;font-size:13.5px}
+  .seg .track{height:12px;background:#0d1117}
+  .seg .fill{height:100%}
+  .verdict{margin-top:18px;padding:14px 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:14px}
+  .verdict h3{margin:0 0 6px;font-size:15px}
+  .ok{border-color:var(--green)} .warn{border-color:var(--amber)} .bad{border-color:var(--red)}
+  .notes{font-size:13px;color:var(--dim);margin-top:12px}
+  .notes li{margin-bottom:6px}
+  .num{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<header>
+  <h1>Context Budget Calculator</h1>
+  <div class="sub">A context window is a budget, not a bucket. Everything the model sees in one call competes for the same space,
+  and quality degrades as the window fills. Drag the sliders to see where your tokens go.</div>
+</header>
+<main>
+  <section>
+    <div class="ctrl">
+      <label>Context window size <b id="winv">200k</b></label>
+      <select id="win">
+        <option value="8000">8k (small / local)</option>
+        <option value="32000">32k</option>
+        <option value="128000">128k</option>
+        <option value="200000" selected>200k (large hosted)</option>
+        <option value="1000000">1M (long-context tier)</option>
+      </select>
+    </div>
+    <div class="ctrl"><label>System prompt + tool definitions <b><span id="v1">0</span></b></label><input type="range" id="s1" min="0" max="40000" step="250" value="6000"></div>
+    <div class="ctrl"><label>Rules file (AGENTS.md) <b><span id="v2">0</span></b></label><input type="range" id="s2" min="0" max="40000" step="250" value="2000"></div>
+    <div class="ctrl"><label>Conversation history <b><span id="v3">0</span></b></label><input type="range" id="s3" min="0" max="150000" step="1000" value="30000"></div>
+    <div class="ctrl"><label>Files + tool results <b><span id="v4">0</span></b></label><input type="range" id="s4" min="0" max="200000" step="1000" value="45000"></div>
+    <div class="ctrl"><label>Reserve room to think (output budget) <b><span id="v5">0</span></b></label><input type="range" id="s5" min="0" max="60000" step="1000" value="16000"></div>
+    <div class="notes"><ul>
+      <li>Rule of thumb, not a law: keep the noisiest parts (history, full-file reads) small and the durable parts (rules, task) tight.</li>
+      <li>Token counts vary by tokenizer; treat every number here as an estimate for planning, not an invoice.</li>
+      <li>A 1M-token window does not mean you should use it — long inputs are slower, pricier and easier to get wrong.</li>
+    </ul></div>
+  </section>
+  <section>
+    <div class="stack" id="stack"></div>
+    <div class="verdict" id="verdict"><h3>Verdict</h3><p>Move a slider.</p></div>
+  </section>
+</main>
+<script>
+(function(){
+  var DEFS = [
+    {id:'s1', v:'v1', key:'System + tools', color:'var(--blue)',   key2:'fixed cost of the harness'},
+    {id:'s2', v:'v2', key:'Rules file',     color:'var(--green)',  key2:'you control this'},
+    {id:'s3', v:'v3', key:'Conversation',   color:'var(--amber)',  key2:'rotting: stale plans, dead ends'},
+    {id:'s4', v:'v4', key:'Files + tools',  color:'var(--teal)',   key2:'the actual work'},
+    {id:'s5', v:'v5', key:'Think reserve',  color:'var(--purple)', key2:'keep it — do not fill it'}
+  ];
+  var win = document.getElementById('win');
+  var stack = document.getElementById('stack'), verdict = document.getElementById('verdict');
+
+  function render(){
+    var total = 0, i, used = 0;
+    var vals = [];
+    for (i=0;i<DEFS.length;i++){
+      var val = +document.getElementById(DEFS[i].id).value;
+      vals.push(val); used += val;
+      document.getElementById(DEFS[i].v).textContent = val.toLocaleString();
+    }
+    var w = +win.value;
+    var html = '';
+    for (i=0;i<DEFS.length;i++){
+      var pct = Math.min(100, Math.round(vals[i]/w*100));
+      html += '<div class="seg"><div class="head"><span>'+DEFS[i].key+' <span style="color:#6e7681">— '+DEFS[i].key2+'</span></span>'
+            + '<span class="num">'+vals[i].toLocaleString()+' tok · '+pct+'%</span></div>'
+            + '<div class="track"><div class="fill" style="width:'+pct+'%;background:'+DEFS[i].color+'"></div></div></div>';
+    }
+    stack.innerHTML = html;
+
+    var fill = Math.round(used/w*100);
+    var cls, title, msg;
+    if (fill <= 60){ cls='ok'; title='Comfortable ('+fill+'% of the window)';
+      msg='Plenty of headroom. Good place to work: fast, cheap, and unlikely to lose the thread.'; }
+    else if (fill <= 85){ cls='warn'; title='Getting full ('+fill+'% of the window)';
+      msg='Expect context rot: the model starts ignoring early instructions and repeating itself. Compact or clear before the next task.'; }
+    else { cls='bad'; title='Over budget ('+fill+'% of the window)';
+      msg='You are at or past the limit: something will be truncated, and it will not be the part you would have chosen. Start a fresh session (or a sub-agent) with a written hand-off.'; }
+    verdict.className = 'verdict ' + cls;
+    verdict.innerHTML = '<h3>'+title+'</h3><p>'+msg+'</p>'
+      + '<p style="color:var(--dim);font-size:13px;margin-top:8px">Used '+used.toLocaleString()+' of '+w.toLocaleString()
+      + ' tokens · '+Math.max(0,w-used).toLocaleString()+' left. Cheapest fixes: shorter rules file, targeted file reads, '
+      + '<code>/clear</code> between tasks, a docs index instead of a repo dump.</p>';
+  }
+  for (var i=0;i<DEFS.length;i++) document.getElementById(DEFS[i].id).addEventListener('input', render);
+  win.addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>
